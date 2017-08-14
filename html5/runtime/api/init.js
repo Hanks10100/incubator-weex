@@ -19,7 +19,7 @@
 
 import { init as initTaskHandler } from '../bridge/TaskCenter'
 import { registerElement } from '../vdom/WeexElement'
-import { services, register, unregister } from './service'
+import { services, register, unregister, createServices } from './service'
 
 let frameworks
 let runtimeConfig
@@ -45,26 +45,6 @@ function getBundleType (code) {
 
   // default bundle type
   return 'Weex'
-}
-
-function createServices (id, env, config) {
-  // Init JavaScript services for this instance.
-  const serviceMap = Object.create(null)
-  serviceMap.service = Object.create(null)
-  services.forEach(({ name, options }) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[JS Runtime] create service ${name}.`)
-    }
-    const create = options.create
-    if (create) {
-      const result = create(id, env, config)
-      Object.assign(serviceMap.service, result)
-      Object.assign(serviceMap, result.instance)
-    }
-  })
-  delete serviceMap.service.instance
-  Object.freeze(serviceMap.service)
-  return serviceMap
 }
 
 const instanceMap = {}

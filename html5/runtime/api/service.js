@@ -75,3 +75,26 @@ export function has (name) {
 function indexOf (name) {
   return services.map(service => service.name).indexOf(name)
 }
+
+/**
+ * Generate service map
+ */
+export function createServices (id, env, config) {
+  // Init JavaScript services for this instance.
+  const serviceMap = Object.create(null)
+  serviceMap.service = Object.create(null)
+  services.forEach(({ name, options }) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[JS Runtime] create service ${name}.`)
+    }
+    const create = options.create
+    if (create) {
+      const result = create(id, env, config)
+      Object.assign(serviceMap.service, result)
+      Object.assign(serviceMap, result.instance)
+    }
+  })
+  delete serviceMap.service.instance
+  Object.freeze(serviceMap.service)
+  return serviceMap
+}
