@@ -28,7 +28,7 @@ import * as shared from '../shared'
 
 import init from './api/init'
 import config from './api/config'
-import { register, unregister, has } from './api/service'
+import { registerService, unregisterService, hasService } from './api/service'
 
 /* istanbul ignore next */
 function freezePrototype () {
@@ -48,7 +48,7 @@ export default {
   resetNativeConsole: shared.resetNativeConsole,
   setNativeTimer: shared.setNativeTimer,
   resetNativeTimer: shared.resetNativeTimer,
-  service: { register, unregister, has },
+  service: { registerService, unregisterService, hasService },
   freezePrototype,
   init,
   config

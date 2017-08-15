@@ -32,7 +32,7 @@ export default function (frameworks) {
   const { native, transformer } = subversion
 
   for (const serviceName in services) {
-    runtime.service.register(serviceName, services[serviceName])
+    runtime.service.registerService(serviceName, services[serviceName])
   }
 
   runtime.freezePrototype()

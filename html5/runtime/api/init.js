@@ -19,11 +19,10 @@
 
 import { init as initTaskHandler } from '../bridge/TaskCenter'
 import { registerElement } from '../vdom/WeexElement'
-import { register, unregister } from './service'
+import { registerService, unregisterService } from './service'
 import { getFrameworkType, createInstance, refreshInstance, destroyInstance } from './instance'
 
-let frameworks
-let runtimeConfig
+const runtimeConfig = {}
 
 export function getRuntimeConfig () {
   return runtimeConfig
@@ -33,8 +32,8 @@ const methods = {
   createInstance,
   refreshInstance,
   destroyInstance,
-  registerService: register,
-  unregisterService: unregister
+  registerService,
+  unregisterService
 }
 
 /**
@@ -46,8 +45,8 @@ function genInit (methodName) {
     if (methodName === 'registerComponents') {
       checkComponentMethods(args[0])
     }
-    for (const name in frameworks) {
-      const framework = frameworks[name]
+    for (const name in runtimeConfig.frameworks) {
+      const framework = runtimeConfig.frameworks[name]
       if (framework && framework[methodName]) {
         framework[methodName](...args)
       }
@@ -73,38 +72,23 @@ function genInstance (methodName) {
   methods[methodName] = function (...args) {
     const id = args[0]
     const type = getFrameworkType(id)
-    if (type && frameworks[type]) {
-      return frameworks[type][methodName](...args)
-    }
-    return new Error(`invalid instance id "${id}"`)
-  }
-}
-
-/**
- * Adapt some legacy method(s) which will be called for each instance. These
- * methods should be deprecated and removed later.
- * @param {string} methodName
- * @param {string} nativeMethodName
- */
-function adaptInstance (methodName, nativeMethodName) {
-  methods[nativeMethodName] = function (...args) {
-    const id = args[0]
-    const type = getFrameworkType(id)
-    if (type && frameworks[type]) {
-      return frameworks[type][methodName](...args)
+    const framework = runtimeConfig.frameworks[type]
+    if (type && framework) {
+      return framework[methodName](...args)
     }
     return new Error(`invalid instance id "${id}"`)
   }
 }
 
 export default function init (config) {
-  runtimeConfig = config || {}
-  frameworks = runtimeConfig.frameworks || {}
+  Object.assign(runtimeConfig, config)
+
   initTaskHandler()
 
   // Init each framework by `init` method and `config` which contains three
   // virtual-DOM Class: `Document`, `Element` & `Comment`, and a JS bridge method:
   // `sendTasks(...args)`.
+  const frameworks = runtimeConfig.frameworks || {}
   for (const name in frameworks) {
     const framework = frameworks[name]
     framework.init(config)
@@ -115,7 +99,8 @@ export default function init (config) {
 
   ; ['receiveTasks', 'getRoot'].forEach(genInstance)
 
-  adaptInstance('receiveTasks', 'callJS')
+  // adapt instance
+  methods.callJS = methods.receiveTasks
 
   return methods
 }
