@@ -98,3 +98,11 @@ export function createServices (id, env, config) {
   Object.freeze(serviceMap.service)
   return serviceMap
 }
+
+export function refreshServices (id, env, config) {
+
+}
+
+export function destroyServices (id, env, config) {
+
+}
