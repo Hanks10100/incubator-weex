@@ -17,17 +17,15 @@
  * under the License.
  */
 
-/**
- * Get a unique id.
- */
-let nextNodeRef = 1
-export function uniqueId () {
-  return (nextNodeRef++).toString()
-}
+// Get a unique id.
+export const uniqueId = (() => {
+  let nextNodeRef = 1
+  return () => String(nextNodeRef++)
+})()
 
 export function typof (v) {
-  const s = Object.prototype.toString.call(v)
-  return s.substring(8, s.length - 1)
+  const type = Object.prototype.toString.call(v)
+  return type.substring(8, type.length - 1)
 }
 
 export function bufferToBase64 (buffer) {
