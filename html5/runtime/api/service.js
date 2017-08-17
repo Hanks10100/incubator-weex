@@ -18,7 +18,6 @@
  */
 
 // JS Services
-
 export const services = []
 
 /**
@@ -35,8 +34,8 @@ export const services = []
  *                         return an object of what variables or classes
  *                         would be injected into the Weex instance.
  */
-export function register (name, options) {
-  if (has(name)) {
+export function registerService (name, options) {
+  if (hasService(name)) {
     console.warn(`Service "${name}" has been registered already!`)
   }
   else {
@@ -49,7 +48,7 @@ export function register (name, options) {
  * Unregister a JavaScript service by name
  * @param {string} name
  */
-export function unregister (name) {
+export function unregisterService (name) {
   services.some((service, index) => {
     if (service.name === name) {
       services.splice(index, 1)
@@ -63,15 +62,47 @@ export function unregister (name) {
  * @param  {string}  name
  * @return {Boolean}
  */
-export function has (name) {
-  return indexOf(name) >= 0
+export function hasService (name) {
+  return services.map(service => service.name).indexOf(name) >= 0
 }
 
 /**
- * Find the index of a JavaScript service by name
- * @param  {string} name
- * @return {number}
+ * Generate service map
  */
-function indexOf (name) {
-  return services.map(service => service.name).indexOf(name)
+export function createServices (id, env, config) {
+  // Init JavaScript services for this instance.
+  const serviceMap = Object.create(null)
+  serviceMap.service = Object.create(null)
+  services.forEach(({ name, options }) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[JS Runtime] create service ${name}.`)
+    }
+    const create = options.create
+    if (create) {
+      const result = create(id, env, config)
+      Object.assign(serviceMap.service, result)
+      Object.assign(serviceMap, result.instance)
+    }
+  })
+  delete serviceMap.service.instance
+  Object.freeze(serviceMap.service)
+  return serviceMap
+}
+
+export function refreshServices (id, env, config) {
+  services.forEach(service => {
+    const refresh = service.options.refresh
+    if (typeof refresh === 'function') {
+      refresh(id, env, config)
+    }
+  })
+}
+
+export function destroyServices (id, env, config) {
+  services.forEach(service => {
+    const destroy = service.options.destroy
+    if (typeof destroy === 'function') {
+      destroy(id, env, config)
+    }
+  })
 }

@@ -46,7 +46,7 @@ export function createContext () {
   currentConfig.frameworks = frameworks
 
   for (const serviceName in services) {
-    runtime.service.register(serviceName, services[serviceName])
+    runtime.service.registerService(serviceName, services[serviceName])
   }
 
   const context = runtime.init(currentConfig)
