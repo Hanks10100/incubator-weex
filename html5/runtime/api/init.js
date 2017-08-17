@@ -18,8 +18,9 @@
  */
 
 import { init as initTaskHandler } from '../bridge/TaskCenter'
-import { registerElement } from '../vdom/WeexElement'
 import { registerService, unregisterService } from './service'
+import { registerModules } from './module'
+import { registerComponents } from './component'
 import { getFrameworkType, createInstance, refreshInstance, destroyInstance } from './instance'
 
 const runtimeConfig = {}
@@ -39,11 +40,12 @@ const methods = {
 /**
  * Register methods which init each frameworks.
  * @param {string} methodName
+ * @param {function} sharedMethod
  */
-function genInit (methodName) {
+function adaptMethod (methodName, sharedMethod) {
   methods[methodName] = function (...args) {
-    if (methodName === 'registerComponents') {
-      checkComponentMethods(args[0])
+    if (typeof sharedMethod === 'function') {
+      sharedMethod(...args)
     }
     for (const name in runtimeConfig.frameworks) {
       const framework = runtimeConfig.frameworks[name]
@@ -51,16 +53,6 @@ function genInit (methodName) {
         framework[methodName](...args)
       }
     }
-  }
-}
-
-function checkComponentMethods (components) {
-  if (Array.isArray(components)) {
-    components.forEach((name) => {
-      if (name && name.type && name.methods) {
-        registerElement(name.type, name.methods)
-      }
-    })
   }
 }
 
@@ -94,8 +86,9 @@ export default function init (config) {
     framework.init(config)
   }
 
-  // @todo: The method `registerMethods` will be re-designed or removed later.
-  ; ['registerComponents', 'registerModules', 'registerMethods'].forEach(genInit)
+  adaptMethod('registerComponents', registerComponents)
+  adaptMethod('registerModules', registerModules)
+  adaptMethod('registerMethods')
 
   ; ['receiveTasks', 'getRoot'].forEach(genInstance)
 
