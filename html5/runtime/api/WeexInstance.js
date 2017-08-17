@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import Document from '../vdom/Document'
 import { isRegisteredModule, getModuleDescription } from './module'
 import { isRegisteredComponent } from './component'
 
@@ -32,22 +33,26 @@ function setId (weex, id) {
 function getId (weex) { return weex['[[currentInstanceId]]'] }
 
 export default class WeexInstance {
-  constructor (id, options) {
+  constructor (id, config) {
     setId(this, id)
-    this.document = null
+    this.config = config || {}
+    this.document = new Document(id, this.config.bundleUrl)
+    this.requireModule = this.requireModule.bind(this)
+    this.isRegisteredModule = isRegisteredModule
+    this.isRegisteredComponent = isRegisteredComponent
   }
 
   requireModule (name) {
     const id = getId(this)
     if (!(id && this.document && this.document.taskCenter)) {
       console.error(`[JS Framework] invalid instance id "${id}"`)
-      return null
+      return
     }
 
     // warn for unknown module
     if (!isRegisteredModule(name)) {
       console.warn(`[JS Framework] using unregistered weex module "${name}"`)
-      return null
+      return
     }
 
     // create new module proxy

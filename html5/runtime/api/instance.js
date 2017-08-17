@@ -18,7 +18,6 @@
  */
 
 import { createServices, refreshServices, destroyServices } from './service'
-import Document from '../vdom/Document'
 import WeexInstance from './WeexInstance'
 import { getRuntimeConfig } from './init'
 const versionRegExp = /^\s*\/\/ *(\{[^}]*\}) *\r?\n/
@@ -72,15 +71,12 @@ export function createInstance (id, code, config, data) {
   config = JSON.parse(JSON.stringify(config || {}))
   config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
 
-  const weex = new WeexInstance(id)
-  const document = new Document(id, config.bundleUrl)
-  weex.document = document
-  weex.config = config
+  const weex = new WeexInstance(id, config)
   Object.freeze(weex)
 
   const context = {
     weex,
-    config,
+    config, // TODO: deprecated
     created: Date.now(),
     framework: bundleType
   }
