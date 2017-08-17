@@ -43,19 +43,20 @@ function registerNode (docId, node) {
 }
 
 export default class Element extends Node {
-  constructor (type = DEFAULT_TAG_NAME, props, isExtended) {
+  constructor (type, props, isExtended) {
     super()
 
+    // TODO: deprecated
     const WeexElement = getWeexElement(type)
     if (WeexElement && !isExtended) {
-      return new WeexElement(props)
+      return new WeexElement(type, props, true)
     }
 
     props = props || {}
     this.nodeType = 1
     this.nodeId = uniqueId()
     this.ref = this.nodeId
-    this.type = type
+    this.type = type || DEFAULT_TAG_NAME
     this.attr = props.attr || {}
     this.style = props.style || {}
     this.classStyle = props.classStyle || {}

@@ -18,8 +18,9 @@
  */
 import { getTaskCenter } from './operation'
 
-let Element
+let Element // TODO: import Element
 
+// deprecated
 export function setElement (El) {
   Element = El
 }

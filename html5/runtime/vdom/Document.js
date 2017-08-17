@@ -19,6 +19,7 @@
 
 import Comment from './Comment'
 import Element from './Element'
+import { getWeexElement } from './WeexElement'
 import Listener from '../bridge/Listener'
 import { TaskCenter } from '../bridge/TaskCenter'
 import { createHandler } from '../bridge/Handler'
@@ -136,6 +137,10 @@ export default class Document {
   * @return {object} element
   */
   createElement (tagName, props) {
+    const WeexElement = getWeexElement(tagName)
+    if (WeexElement) {
+      return new WeexElement(tagName, props)
+    }
     return new Element(tagName, props)
   }
 

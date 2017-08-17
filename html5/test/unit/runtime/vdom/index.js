@@ -56,13 +56,15 @@ describe('component methods management', () => {
 
   it('has registered element types', () => {
     expect(isWeexElement('x')).to.be.true
+    expect(isWeexElement('y')).to.be.false
+    expect(isWeexElement('z')).to.be.false
   })
 
   it('will call component method', () => {
     const spy = sinon.spy()
     const doc = new Document('test', '', spy)
     const x = new Element('x')
-    const y = new Element('y')
+    const y = doc.createElement('y')
     const z = new Element('z')
     const n = new Element('n')
     expect(x.foo).is.function
