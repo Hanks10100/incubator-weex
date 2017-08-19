@@ -19,8 +19,8 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 
-import service from '../../../services/broadcast-channel/index'
-import { MessageEvent } from '../../../services/broadcast-channel/message-event'
+import service from '../../../services/broadcast-channel'
+import { MessageEvent } from '../../../services/broadcast-channel/BroadcastChannel'
 const { BroadcastChannel } = service.create('foo').instance
 
 describe('BroadcastChannel', () => {
