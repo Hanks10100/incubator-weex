@@ -47,6 +47,8 @@ function adaptMethod (methodName, sharedMethod) {
     if (typeof sharedMethod === 'function') {
       sharedMethod(...args)
     }
+
+    // TODO: deprecated
     for (const name in runtimeConfig.frameworks) {
       const framework = runtimeConfig.frameworks[name]
       if (framework && framework[methodName]) {
@@ -60,6 +62,7 @@ function adaptMethod (methodName, sharedMethod) {
  * Register methods which will be called for each instance.
  * @param {string} methodName
  */
+// TODO: move to instance.js
 function genInstance (methodName) {
   methods[methodName] = function (...args) {
     const id = args[0]
@@ -90,6 +93,7 @@ export default function init (config) {
   adaptMethod('registerModules', registerModules)
   adaptMethod('registerMethods')
 
+  // TODO: deprecated
   ; ['receiveTasks', 'getRoot'].forEach(genInstance)
 
   // adapt instance

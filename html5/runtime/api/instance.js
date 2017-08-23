@@ -94,6 +94,25 @@ export function createInstance (id, code, config, data) {
   return fm.createInstance(id, code, config, data, context)
 }
 
+// function runInContext (code, context) {
+//   const functionBody = `
+//     (function (global) {
+//       "use strict";
+//       ${code}
+//     })(Object.create(this))
+//   `
+
+//   // const keys = Object.keys(context)
+//   // const args = Object.values(context)
+//   const keys = []
+//   const args = []
+//   for (const key in context) {
+//     keys.push(key)
+//     args.push(context[key])
+//   }
+//   return (new Function(...keys, functionBody))(...args)
+// }
+
 export function refreshInstance (id, ...args) {
   const type = getFrameworkType(id)
   const runtimeConfig = getRuntimeConfig()
