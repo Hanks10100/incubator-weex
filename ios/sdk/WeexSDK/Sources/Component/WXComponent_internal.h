@@ -67,6 +67,7 @@
     UIAccessibilityTraits _role; //accessibility
     NSString * _ariaLabel; //accessibilityLabel
     BOOL _ariaHidden; // accessibilityElementsHidden
+    BOOL _accessible; // accessible
     NSString * _testId;// just for auto-test
     
     /**
@@ -180,6 +181,8 @@
 - (void)_handleLayoutAnimationWithStyles:(NSDictionary *)styles;
 
 - (void)_modifyStyles:(NSDictionary *)styles;
+
+- (void)_transitionUpdateViewProperty:(NSDictionary *)styles;
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles;
 

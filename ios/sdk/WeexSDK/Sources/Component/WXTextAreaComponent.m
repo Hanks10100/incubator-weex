@@ -20,6 +20,7 @@
 #import "WXTextAreaComponent.h"
 #import "WXUtility.h"
 #import "WXComponent+Layout.h"
+#import "WXComponent_internal.h"
 
 #define CorrectX 4 //textview fill text 4 pixel from left. so placeholderlabel have 4 pixel too
 #define CorrectY 8 // textview fill text 8 pixel from top
@@ -45,6 +46,11 @@ typedef UITextView WXTextAreaView;
         self.placeHolderLabel = [[UILabel alloc] init];
         self.placeHolderLabel.numberOfLines = 0;
         [_textView addSubview:self.placeHolderLabel];
+    }
+    // default placeholder hide from voice over
+    self.placeHolderLabel.isAccessibilityElement = NO;
+    if(!_testId) {
+        _textView.isAccessibilityElement = YES;
     }
     _textView.delegate = self;
     [_textView setNeedsDisplay];
