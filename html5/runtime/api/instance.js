@@ -74,44 +74,54 @@ export function createInstance (id, code, config, data) {
   const weex = new WeexInstance(id, config)
   Object.freeze(weex)
 
-  const context = {
-    weex,
+  const runtimeEnv = {
+    weex, // TODO: deprecated
     config, // TODO: deprecated
     created: Date.now(),
     framework: bundleType
   }
-  context.services = createServices(id, context, runtimeConfig)
-  instanceMap[id] = context
+
+  // TODO: deprecated, no need to pass services to runtime env
+  runtimeEnv.services = createServices(id, runtimeEnv, runtimeConfig)
+  instanceMap[id] = runtimeEnv
+
+  const runtimeContext = Object.create(null)
+  Object.assign(runtimeContext, runtimeEnv.services, { weex })
+
+  const framework = runtimeConfig.frameworks[bundleType]
+  if (!framework) {
+    return new Error(`invalid bundle type "${bundleType}".`)
+  }
 
   if (process.env.NODE_ENV === 'development') {
     console.debug(`[JS Framework] create an ${bundleType} instance`)
   }
 
-  const fm = runtimeConfig.frameworks[bundleType]
-  if (!fm) {
-    return new Error(`invalid bundle type "${bundleType}".`)
+  // run create instance
+  if (typeof framework.prepareInstanceContext === 'function') {
+    const instanceContext = framework.prepareInstanceContext(runtimeContext)
+    return runInContext(code, instanceContext)
   }
-  return fm.createInstance(id, code, config, data, context)
+  return framework.createInstance(id, code, config, data, runtimeEnv)
 }
 
-// function runInContext (code, context) {
-//   const functionBody = `
-//     (function (global) {
-//       "use strict";
-//       ${code}
-//     })(Object.create(this))
-//   `
+function runInContext (code, context) {
+  const keys = []
+  const args = []
+  for (const key in context) {
+    keys.push(key)
+    args.push(context[key])
+  }
 
-//   // const keys = Object.keys(context)
-//   // const args = Object.values(context)
-//   const keys = []
-//   const args = []
-//   for (const key in context) {
-//     keys.push(key)
-//     args.push(context[key])
-//   }
-//   return (new Function(...keys, functionBody))(...args)
-// }
+  const bundleFn = new Function(...keys, `
+    (function (global) {
+      "use strict";
+      ${code}
+    })(Object.create(this))
+  `)
+
+  return bundleFn(...args)
+}
 
 export function refreshInstance (id, ...args) {
   const type = getFrameworkType(id)
