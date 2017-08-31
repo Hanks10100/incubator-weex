@@ -113,14 +113,14 @@ function runInContext (code, context) {
     args.push(context[key])
   }
 
-  const bundleFn = new Function(...keys, `
+  const bundle = `
     (function (global) {
       "use strict";
       ${code}
     })(Object.create(this))
-  `)
+  `
 
-  return bundleFn(...args)
+  return (new Function(...keys, bundle))(...args)
 }
 
 export function refreshInstance (id, ...args) {
@@ -133,7 +133,7 @@ export function refreshInstance (id, ...args) {
 
   const fm = runtimeConfig.frameworks[type]
   if (!fm) {
-    return new Error(`invalid bundle type "${type}".`)
+    return new Error(`refreshInstance: the instance id of "${type}" is not found.`)
   }
   return fm.refreshInstance(id, ...args)
 }
@@ -148,7 +148,7 @@ export function destroyInstance (id, ...args) {
 
   const fm = runtimeConfig.frameworks[type]
   if (!fm) {
-    return new Error(`invalid bundle type "${type}".`)
+    return new Error(`destroyInstance: the instance id of "${type}" is not found.`)
   }
   delete instanceMap[id]
   return fm.destroyInstance(id, ...args)
