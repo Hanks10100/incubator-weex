@@ -265,6 +265,26 @@ describe('test input and output', function () {
       app.$destroy()
     })
 
+    it('toggle-if case', (done) => {
+      const name = 'toggle-if'
+      const sourceCode = readSource(name)
+      const outputCode = readOutput(name)
+
+      app.$create(sourceCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$fireEvent(app.doc.body.ref, 'click', {})
+
+      setTimeout(() => {
+        const $root = app.getRealRoot()
+        expect($root.children[0].attr).eql({ value: 'BBB' })
+        expect($root.children[1].attr).eql({ value: 'CCC' })
+        app.$destroy()
+        done()
+      }, 10)
+    })
+
     it('click case', () => {
       const name = 'click'
       const sourceCode = readSource(name)
