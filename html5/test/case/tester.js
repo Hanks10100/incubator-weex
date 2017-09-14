@@ -285,7 +285,7 @@ describe('test input and output', function () {
       }, 10)
     })
 
-    it('click case', () => {
+    it('click case', (done) => {
       const name = 'click'
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
@@ -294,9 +294,13 @@ describe('test input and output', function () {
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
-      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
-
-      app.$destroy()
+      app.$fireEvent(app.doc.body.ref, 'click', {})
+      setTimeout(() => {
+        expected.children[0].attr.value = 'changed'
+        expect(app.getRealRoot()).eql(expected)
+        app.$destroy()
+        done()
+      }, 10)
     })
 
     it('inline click case', () => {

@@ -20,9 +20,12 @@ define('@weex-component/click', function (require, exports, module) {
 
 ;
   module.exports = {
+    data: function () {
+      return { str: 'original' }
+    },
     methods: {
-      gotoDetail: function () {
-        this.$openURL('https://item.taobao.com/item.htm?id=520421163634')
+      change: function () {
+        this.str = 'changed'
       }
     }
   }
@@ -45,25 +48,15 @@ define('@weex-component/click', function (require, exports, module) {
 ;module.exports.template = {
   "type": "container",
   "events": {
-    "click": "gotoDetail"
+    "click": "change"
   },
-  "children": [
-    {
-      "type": "image",
-      "classList": [
-        "thumb"
-      ],
-      "attr": {
-        "src": "https://gd2.alicdn.com/bao/uploaded/i2/T14H1LFwBcXXXXXXXX_!!0-item_pic.jpg"
-      }
-    },
-    {
+  "children": [{
       "type": "text",
       "classList": [
         "title"
       ],
       "attr": {
-        "value": "一个超赞的宝贝标题"
+        "value": function() { return this.str }
       }
     }
   ]
