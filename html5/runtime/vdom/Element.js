@@ -344,12 +344,13 @@ export default class Element extends Node {
 
   /**
    * Add an event handler.
-   * @param {string} event type
-   * @param {function} event handler
+   * @param {string} type event type
+   * @param {function} handler event handler
+   * @param {object} params event handler parameters
    */
-  addEvent (type, handler) {
+  addEvent (type, handler, params) {
     if (!this.event[type]) {
-      this.event[type] = handler
+      this.event[type] = { handler, params }
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
         taskCenter.send(
@@ -386,15 +387,21 @@ export default class Element extends Node {
    * @param {boolean} isBubble whether or not event bubble
    * @return {} anything returned by handler function
    */
-  fireEvent (type, e, isBubble) {
+  fireEvent (type, e, isBubble, params) {
     let result = null
     let isStopPropagation = false
-    const handler = this.event[type]
-    if (handler && e) {
+    const eventDesc = this.event[type]
+    if (eventDesc && e) {
+      const handler = eventDesc.handler
       e.stopPropagation = () => {
         isStopPropagation = true
       }
-      result = handler.call(this, e)
+      if (params) {
+        result = handler.call(this, params)
+      }
+      else {
+        result = handler.call(this, e)
+      }
     }
 
     if (!isStopPropagation
@@ -428,7 +435,16 @@ export default class Element extends Node {
       attr: this.attr,
       style: this.toStyle()
     }
-    const event = Object.keys(this.event)
+    const event = []
+    for (const eventType in this.event) {
+      const { params } = this.event[eventType]
+      if (!params) {
+        event.push(eventType)
+      }
+      else {
+        event.push({ type: eventType, params })
+      }
+    }
     if (event.length) {
       result.event = event
     }

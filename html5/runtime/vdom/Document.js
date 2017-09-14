@@ -161,7 +161,7 @@ export default class Document {
   * @param {object} dom changes
   * @return {} anything returned by handler function
   */
-  fireEvent (el, type, e, domChanges) {
+  fireEvent (el, type, e, domChanges, params) {
     if (!el) {
       return
     }
@@ -174,7 +174,7 @@ export default class Document {
       updateElement(el, domChanges)
     }
     const isBubble = this.getRef('_root').attr['bubble'] === 'true'
-    return el.fireEvent(type, e, isBubble)
+    return el.fireEvent(type, e, isBubble, params)
   }
 
   /**
