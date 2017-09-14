@@ -397,7 +397,7 @@ export default class Element extends Node {
         isStopPropagation = true
       }
       if (params) {
-        result = handler.call(this, params)
+        result = handler.call(this, ...params, e)
       }
       else {
         result = handler.call(this, e)
