@@ -385,9 +385,10 @@ export default class Element extends Node {
    * @param {string} type type
    * @param {function} e handler
    * @param {boolean} isBubble whether or not event bubble
+   * @param {object} options additional options
    * @return {} anything returned by handler function
    */
-  fireEvent (type, e, isBubble, params) {
+  fireEvent (type, e, isBubble, options) {
     let result = null
     let isStopPropagation = false
     const eventDesc = this.event[type]
@@ -396,14 +397,15 @@ export default class Element extends Node {
       e.stopPropagation = () => {
         isStopPropagation = true
       }
-      if (params) {
-        result = handler.call(this, ...params, e)
+      if (options && options.params) {
+        result = handler.call(this, ...options.params, e)
       }
       else {
         result = handler.call(this, e)
       }
     }
 
+    // TODO: bubble in next tick
     if (!isStopPropagation
       && isBubble
       && BUBBLE_EVENTS.includes(type)

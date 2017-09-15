@@ -156,25 +156,26 @@ export default class Document {
   /**
   * Fire an event on specified element manually.
   * @param {object} element
-  * @param {string} event type
-  * @param {object} event object
-  * @param {object} dom changes
+  * @param {string} type event type
+  * @param {object} event  event object
+  * @param {object} domChanges
+   * @param {object} options additional options
   * @return {} anything returned by handler function
   */
-  fireEvent (el, type, e, domChanges, params) {
+  fireEvent (el, type, event, domChanges, options) {
     if (!el) {
       return
     }
-    e = e || {}
-    e.type = type
-    e.target = el
-    e.currentTarget = el
-    e.timestamp = Date.now()
+    event = event || {}
+    event.type = type
+    event.target = el
+    event.currentTarget = el
+    event.timestamp = Date.now()
     if (domChanges) {
       updateElement(el, domChanges)
     }
     const isBubble = this.getRef('_root').attr['bubble'] === 'true'
-    return el.fireEvent(type, e, isBubble, params)
+    return el.fireEvent(type, event, isBubble, options)
   }
 
   /**
