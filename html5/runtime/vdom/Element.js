@@ -326,6 +326,10 @@ export default class Element extends Node {
    * @param {object} classStyle
    */
   setClassStyle (classStyle) {
+    if (!classStyle) {
+      return
+    }
+
     // reset previous class style to empty string
     for (const key in this.classStyle) {
       this.classStyle[key] = ''
