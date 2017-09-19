@@ -136,7 +136,7 @@ export default class Document {
   * @param {objct} props
   * @return {object} element
   */
-  createElement (tagName, props) {
+  createElement (tagName, props = {}) {
     const WeexElement = getWeexElement(tagName)
     if (WeexElement) {
       return new WeexElement(tagName, props)

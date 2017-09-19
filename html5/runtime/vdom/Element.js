@@ -57,9 +57,9 @@ export default class Element extends Node {
     this.nodeId = uniqueId()
     this.ref = this.nodeId
     this.type = type || DEFAULT_TAG_NAME
-    this.attr = props.attr || {}
-    this.style = props.style || {}
-    this.classStyle = props.classStyle || {}
+    this.attr = Object.assign({}, props.attr)
+    this.style = Object.assign({}, props.style)
+    this.classStyle = Object.assign({}, props.classStyle)
     this.event = {}
     this.children = []
     this.pureChildren = []
@@ -282,7 +282,7 @@ export default class Element extends Node {
    * @param {boolean} silent
    */
   setAttr (key, value, silent) {
-    if (this.attr[key] === value && silent !== false) {
+    if (!this.attr || this.attr[key] === value && silent !== false) {
       return
     }
     this.attr[key] = value
@@ -305,7 +305,7 @@ export default class Element extends Node {
    * @param {boolean} silent
    */
   setStyle (key, value, silent) {
-    if (this.style[key] === value && silent !== false) {
+    if (!this.style || this.style[key] === value && silent !== false) {
       return
     }
     this.style[key] = value
@@ -326,7 +326,7 @@ export default class Element extends Node {
    * @param {object} classStyle
    */
   setClassStyle (classStyle) {
-    if (!classStyle) {
+    if (!this.classStyle || !classStyle) {
       return
     }
 
