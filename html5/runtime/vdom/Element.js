@@ -408,7 +408,7 @@ export default class Element extends Node {
 
     if (!isStopPropagation
       && isBubble
-      && BUBBLE_EVENTS.includes(type)
+      && (BUBBLE_EVENTS.indexOf(type) !== -1)
       && this.parentNode
       && this.parentNode.fireEvent) {
       event.currentTarget = this.parentNode
