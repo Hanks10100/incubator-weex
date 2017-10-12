@@ -1,6 +1,6 @@
 {
   "name": "weex-js-runtime",
-  "version": "0.22.5",
+  "version": "0.22.6",
   "description": "Weex JS Runtime",
   "main": "index.js",
   "engines": {
