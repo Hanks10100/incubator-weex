@@ -27,6 +27,11 @@ function fireEvent (document, nodeId, type, event, domChanges, params) {
   return new Error(`invalid element reference "${nodeId}"`)
 }
 
+function shouldStopPropagation (document, nodeId, type, event = {}, domChanges, params) {
+  event.type = event.type || type
+  return fireEvent(document, nodeId, 'shouldStopPropagation', event, domChanges, params)
+}
+
 function callback (document, callbackId, data, ifKeepAlive) {
   return document.taskCenter.callback(callbackId, data, ifKeepAlive)
 }
@@ -62,6 +67,7 @@ export function receiveTasks (id, tasks) {
       switch (task.method) {
         case 'callback': return callback(document, ...task.args)
         case 'fireEvent': return fireEvent(document, ...task.args)
+        case 'shouldStopPropagation': return shouldStopPropagation(document, ...task.args)
         case 'componentHook': return componentHook(document, ...task.args)
       }
     })
