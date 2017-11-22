@@ -17,6 +17,9 @@
  * under the License.
  */
 
+import { getTaskCenter } from './vdom/operation'
+import { isRegisteredModule } from './api/module'
+
 /**
  * Get a unique id.
  */
@@ -53,19 +56,22 @@ export function base64ToBuffer (base64) {
   return array.buffer
 }
 
-export function createTracker (weex, options = {}) {
-  if (!weex || typeof weex.requireModule !== 'function') {
+export function createTracker (id, options = {}) {
+  const taskCenter = getTaskCenter(id)
+  if (!taskCenter || typeof taskCenter.send !== 'function') {
     console.error(`[JS Framework] Failed to create tracker!`)
   }
   return function WeexJSFrameworkTracker (type, value) {
     if (type && value) {
       const label = `jsfm.${type}.${value}`
       try {
-        const userTrack = weex.requireModule('userTrack')
-        if (userTrack && userTrack.addPerfPoint) {
+        if (isRegisteredModule('userTrack', 'addPerfPoint')) {
           const message = Object.create(null)
           message[label] = '4'
-          userTrack.addPerfPoint(message)
+          taskCenter.send('module', {
+            module: 'userTrack',
+            method: 'addPerfPoint'
+          }, [message])
         }
       }
       catch (err) {

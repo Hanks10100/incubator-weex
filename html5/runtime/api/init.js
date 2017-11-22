@@ -100,7 +100,7 @@ function createInstance (id, code, config, data) {
   config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
 
   const weex = new WeexInstance(id, config)
-  const tracker = createTracker(weex)
+  const tracker = createTracker(id)
   Object.freeze(weex)
 
   const runtimeEnv = {
