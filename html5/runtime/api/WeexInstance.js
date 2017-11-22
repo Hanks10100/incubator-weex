@@ -48,7 +48,8 @@ export default class WeexInstance {
   requireModule (moduleName) {
     const id = getId(this)
     if (!(id && this.document && this.document.taskCenter)) {
-      console.error(`[JS Framework] invalid instance id "${id}"`)
+      console.error(`[JS Framework] Failed to requireModule("${moduleName}"), `
+        + `instance (${id}) doesn't exist anymore.`)
       return
     }
 

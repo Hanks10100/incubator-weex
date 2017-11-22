@@ -60,7 +60,8 @@ function componentHook (document, componentId, type, hook, options) {
 export function receiveTasks (id, tasks) {
   const document = getDoc(id)
   if (!document) {
-    return new Error(`Invalid instance id "${id}", failed the receive tasks.`)
+    return new Error(`[JS Framework] Failed to receiveTasks, `
+      + `instance (${id}) is not available.`)
   }
   if (Array.isArray(tasks)) {
     return tasks.map(task => {

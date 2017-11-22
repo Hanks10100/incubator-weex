@@ -89,7 +89,7 @@ function getFrameworkType (id) {
  */
 function createInstance (id, code, config, data) {
   if (instanceMap[id]) {
-    return new Error(`invalid instance id "${id}"`)
+    return new Error(`[JS Framework] Failed to createInstance, using existed instance id "${id}"`)
   }
 
   // Init instance info.
@@ -206,7 +206,8 @@ function genInstance (methodName) {
 
       return result
     }
-    return new Error(`invalid instance id "${id}"`)
+    return new Error(`[JS Framework] Failed to ${methodName}, `
+      + `instance (${id}) of ${type} doesn't exist anymore.`)
   }
 }
 
