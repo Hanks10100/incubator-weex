@@ -81,7 +81,6 @@ export default class WeexInstance {
     // create new module proxy
     const proxyName = `${moduleName}#${id}`
     if (!moduleProxies[proxyName]) {
-
       // create registered module apis
       const moduleDefine = getModuleDescription(moduleName)
       const moduleApis = {}
