@@ -42,8 +42,7 @@ function updateElement (el, changes) {
 
 export default class Document {
   constructor (id, url, handler) {
-    id = id ? id.toString() : ''
-    this.id = id
+    this.id = String(id)
     this.URL = url
 
     addDoc(id, this)

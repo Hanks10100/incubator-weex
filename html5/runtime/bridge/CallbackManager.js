@@ -32,7 +32,7 @@ function getHookKey (componentId, type, hookName) {
  */
 export default class CallbackManager {
   constructor (instanceId) {
-    this.instanceId = instanceId
+    this.instanceId = String(instanceId)
     this.lastCallbackId = 0
     this.callbacks = {}
     this.hooks = {}

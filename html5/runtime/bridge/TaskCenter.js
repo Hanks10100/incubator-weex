@@ -29,7 +29,7 @@ export class TaskCenter {
   constructor (id, sendTasks) {
     Object.defineProperty(this, 'instanceId', {
       enumerable: true,
-      value: id
+      value: String(id)
     })
     Object.defineProperty(this, 'callbackManager', {
       enumerable: true,
