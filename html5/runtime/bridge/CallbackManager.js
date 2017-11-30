@@ -59,7 +59,7 @@ export default class CallbackManager {
     // TODO: validate arguments
     const key = getHookKey(componentId, type, hookName)
     const hookFunction = this.hooks[key]
-    if (typeof hookFunction === 'function') {
+    if (typeof hookFunction !== 'function') {
       console.error(`[JS Framework] Invalid hook function type (${typeof hookFunction}) on "${key}".`)
       return null
     }
