@@ -107,7 +107,7 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.4.20",
-    "weex-vue-framework": "2.5.4-weex.1"
+    "weex-vue-framework": "2.5.4-weex.2"
   },
   "devDependencies": {
     "@weex-project/weex-picker": "^0.2.4",
