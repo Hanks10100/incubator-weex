@@ -82,9 +82,10 @@ function createInstanceContext (id, options = {}, data) {
   Object.freeze(weex)
 
   const bundleType = options.bundleType || 'Vue'
+  instanceTypeMap[id] = bundleType
   const framework = runtimeConfig.frameworks[bundleType]
   if (!framework) {
-    return new Error(`invalid bundle type "${bundleType}".`)
+    return new Error(`[JS Framework] Invalid bundle type "${bundleType}".`)
   }
   track(id, 'bundleType', bundleType)
 
@@ -116,7 +117,7 @@ function createInstanceContext (id, options = {}, data) {
  */
 function createInstance (id, code, config, data) {
   if (instanceTypeMap[id]) {
-    return new Error(`Thi instance id "${id}" has already been used!`)
+    return new Error(`The instance id "${id}" has already been used!`)
   }
 
   // Init instance info.
@@ -130,7 +131,7 @@ function createInstance (id, code, config, data) {
 
   const framework = runtimeConfig.frameworks[bundleType]
   if (!framework) {
-    return new Error(`invalid bundle type "${bundleType}".`)
+    return new Error(`[JS Framework] Invalid bundle type "${bundleType}".`)
   }
   if (bundleType === 'Weex') {
     console.error(`[JS Framework] COMPATIBILITY WARNING: `
@@ -236,7 +237,8 @@ function genInstance (methodName) {
 
       return result
     }
-    return new Error(`invalid instance id "${id}"`)
+    return new Error(`[JS Framework] Using invalid instance id `
+      + `"${id}" when calling ${methodName}.`)
   }
 }
 
