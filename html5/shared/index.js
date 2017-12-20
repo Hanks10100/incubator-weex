@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import './arrayFrom'
 import './objectAssign'
 import './objectSetPrototypeOf'
@@ -29,4 +30,3 @@ import 'core-js/modules/es6.promise'
 
 export * from './console'
 export * from './setTimeout'
-export * from './freeze'
