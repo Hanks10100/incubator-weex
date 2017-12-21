@@ -3,7 +3,7 @@
   "version": "0.12.2",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.23.5",
+    "framework": "0.23.6",
     "vue-render": "0.12.26",
     "transformer": ">=0.1.5 <0.5"
   },
@@ -38,7 +38,7 @@
   },
   "scripts": {
     "postinstall": "bash ./scripts/install-hooks.sh",
-    "build:native": "node build/build.js native",
+    "build:native": "node build/build.js native && cp packages/weex-js-framework/index.js pre-build/native-bundle-main.js",
     "build:runtime": "node build/build.js runtime",
     "build:legacy": "node build/build.js legacy",
     "build:vanilla": "node build/build.js vanilla",
