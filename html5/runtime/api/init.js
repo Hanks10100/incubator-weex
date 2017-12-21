@@ -95,7 +95,10 @@ function createInstanceContext (id, options = {}, data) {
 
   // prepare runtime context
   const runtimeContext = Object.create(null)
-  Object.assign(runtimeContext, services, { weex })
+  Object.assign(runtimeContext, services, {
+    weex,
+    services // Temporary compatible with some legacy APIs in Rax
+  })
   Object.freeze(runtimeContext)
 
   // prepare instance context
@@ -143,6 +146,16 @@ function createInstance (id, code, config, data) {
 
   const instanceContext = createInstanceContext(id, config, data)
   if (typeof framework.createInstance === 'function') {
+    // Temporary compatible with some legacy APIs in Rax,
+    // some Rax page is using the legacy ".we" framework.
+    if (bundleType === 'Rax' || bundleType === 'Weex') {
+      const raxInstanceContext = Object.assign({
+        config,
+        created: Date.now(),
+        framework: bundleType
+      }, instanceContext)
+      return framework.createInstance(id, code, config, data, raxInstanceContext)
+    }
     return framework.createInstance(id, code, config, data, instanceContext)
   }
   // console.error(`[JS Framework] Can't find available "createInstance" method in ${bundleType}!`)
