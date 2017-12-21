@@ -30,3 +30,4 @@ import 'core-js/modules/es6.promise'
 
 export * from './console'
 export * from './setTimeout'
+export * from './freeze'

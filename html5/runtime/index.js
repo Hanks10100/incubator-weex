@@ -32,6 +32,8 @@ import { register, unregister, has } from './api/service'
 
 /* istanbul ignore next */
 function freezePrototype () {
+  shared.freezePrototype()
+
   // Object.freeze(config.Element)
   Object.freeze(config.Comment)
   Object.freeze(config.Listener)
