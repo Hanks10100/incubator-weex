@@ -26,7 +26,7 @@ echo "Build Weex SDK From Source...."
 
 npm install --production
 npm run install:buildtools
-npm run build:source
+npm run build:jsfm
 
 echo "Javascript Framework and HTML5 SDK build completed."
 sleep 2

@@ -16,22 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-"use strict"
 
 const fs = require('fs')
 const path = require('path')
-const gzip = require('zlib').createGzip()
-const pkg = require('../package.json')
 const rollup = require('rollup')
 const watch = require('rollup-watch')
-const webpack = require('webpack')
-
 const getConfig = require('./config')
-
-// create dist folder
-if (!fs.existsSync('dist')) {
-  fs.mkdirSync('dist')
-}
 
 let isWatch = false
 if (process.argv[3]) {
@@ -43,44 +33,21 @@ if (process.argv[2]) {
   build(process.argv[2])
 }
 else {
-  console.log('\nPlease specify the package you want to build. [native, runtime, browser, vue]')
+  console.log('\nPlease specify the package you want to build.')
 }
 
-function extend(to, ...froms) {
-  froms.forEach(function (from) {
-    for (const key in from) {
-      if (from.hasOwnProperty(key)) {
-        to[key] = from[key]
-      }
-    }
-  })
-  return to
-}
-
-function runRollupOnWatch(config) {
-  const watcher = watch(rollup, config)
-  watcher.on('event', event => {
-    switch ( event.code ) {
-      case 'STARTING':
-        console.log('checking rollup-watch version...')
-        break
-
-      case 'BUILD_START':
-        console.log('bundling...')
-        break
-
-      case 'BUILD_END':
+function runRollupOnWatch (config) {
+  watch(rollup, config).on('event', event => {
+    switch (event.code) {
+      case 'STARTING': console.log('checking rollup-watch version...'); break
+      case 'BUILD_START': console.log('bundling...'); break
+      case 'BUILD_END': {
         console.log('bundled in ' + path.relative(process.cwd(), config.dest)
           + ' (' + event.duration + 'ms)')
-        console.log('Watching for changes...' )
-        break
-
-      case 'ERROR':
-        console.error('ERROR: ', event.error)
-        break
-
-      default:
-        console.error('unknown event', event)
+        console.log('Watching for changes...')
+      } break
+      case 'ERROR': console.error('ERROR: ', event.error); break
+      default: console.error('unknown event', event)
     }
   })
 }
@@ -99,10 +66,12 @@ function runRollup (config) {
 function build (name) {
   let pkgName = 'weex-js-framework'
   switch (name) {
-    case 'native': pkgName = 'weex-js-framework'; break;
-    case 'runtime': pkgName = 'weex-js-runtime'; break;
-    case 'legacy': pkgName = 'weex-legacy-framework'; break;
-    case 'vanilla': pkgName = 'weex-vanilla-framework'; break;
+    case 'jsfm': pkgName = 'weex-js-framework'; break
+    case 'runtime': pkgName = 'weex-js-runtime'; break
+    case 'legacy': pkgName = 'weex-legacy-framework'; break
+    case 'vanilla': pkgName = 'weex-vanilla-framework'; break
+    case 'vue': pkgName = 'weex-vue'; break
+    case 'rax': pkgName = 'weex-rax'; break
   }
 
   const config = getConfig(pkgName)
@@ -112,32 +81,13 @@ function build (name) {
     return runRollupOnWatch(config)
   }
   else {
-    console.log(`\n => start to build ${name} (${pkgName})\n`)
+    console.log(`\n => start to build ${pkgName}\n`)
     return new Promise((resolve, reject) => {
       return runRollup(config).then(() => {
-        let p = Promise.resolve()
-        return p.then(function () {
-          return runRollup(minifyConfig).then(() => {
-            zip(minifyConfig.dest, resolve)
-          })
-        })
+        return runRollup(minifyConfig)
       })
     })
   }
-}
-
-function zip (filePath, callback) {
-  const read = fs.createReadStream(filePath)
-  const write = fs.createWriteStream(filePath + '.gz')
-  read.pipe(gzip).pipe(write).on('close', () => {
-    report(filePath + '.gz')
-    callback && callback()
-  })
-}
-
-function now () {
-  const time = Date.now() - (new Date()).getTimezoneOffset() * 60000
-  return (new Date(time)).toISOString().replace('T', ' ').substring(0, 16)
 }
 
 function report (filePath) {
