@@ -17,27 +17,31 @@
  * under the License.
  */
 
-import Node from './Node'
-import { uniqueId } from '../utils'
+import { uniqueId } from '../shared/utils'
+import { getDoc } from './operation'
 
-export default class Comment extends Node {
-  constructor (value) {
-    super()
-
-    this.nodeType = 8
+export default class Node {
+  constructor () {
     this.nodeId = uniqueId()
     this.ref = this.nodeId
-    this.type = 'comment'
-    this.value = value
     this.children = []
     this.pureChildren = []
+    this.parentNode = null
+    this.nextSibling = null
+    this.previousSibling = null
   }
 
   /**
-  * Convert to HTML comment string.
-  * @return {stirng} html
+  * Destroy current node, and remove itself form nodeMap.
   */
-  toString () {
-    return '<!-- ' + this.value + ' -->'
+  destroy () {
+    const doc = getDoc(this.docId)
+    if (doc) {
+      delete this.docId
+      delete doc.nodeMap[this.nodeId]
+    }
+    this.children.forEach(child => {
+      child.destroy()
+    })
   }
 }

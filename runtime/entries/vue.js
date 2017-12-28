@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import setup from './setup'
-import frameworks from '../../frameworks/index'
 
-setup(frameworks)
+import setup from './setup'
+import * as Vue from 'weex-vue-framework'
+
+setup({ Vue })

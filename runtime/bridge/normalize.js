@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { typof, bufferToBase64, base64ToBuffer } from '../utils'
+import { typof, bufferToBase64, base64ToBuffer } from '../shared/utils'
 
 /**
  * Normalize a primitive value.

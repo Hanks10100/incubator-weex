@@ -19,7 +19,7 @@
 
 import CallbackManager from './CallbackManager'
 import Element from '../vdom/Element'
-import { typof } from '../utils'
+import { typof } from '../shared/utils'
 import { normalizePrimitive } from './normalize'
 
 let fallback = function () {}

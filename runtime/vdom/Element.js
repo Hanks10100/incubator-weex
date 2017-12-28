@@ -28,7 +28,7 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
-import { uniqueId, isEmpty } from '../utils'
+import { uniqueId, isEmpty } from '../shared/utils'
 import { getWeexElement, setElement } from './WeexElement'
 
 const DEFAULT_TAG_NAME = 'div'

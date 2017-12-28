@@ -17,31 +17,7 @@
  * under the License.
  */
 
-import { uniqueId } from '../utils'
-import { getDoc } from './operation'
+import setup from './setup'
+import * as Rax from 'weex-rax-framework'
 
-export default class Node {
-  constructor () {
-    this.nodeId = uniqueId()
-    this.ref = this.nodeId
-    this.children = []
-    this.pureChildren = []
-    this.parentNode = null
-    this.nextSibling = null
-    this.previousSibling = null
-  }
-
-  /**
-  * Destroy current node, and remove itself form nodeMap.
-  */
-  destroy () {
-    const doc = getDoc(this.docId)
-    if (doc) {
-      delete this.docId
-      delete doc.nodeMap[this.nodeId]
-    }
-    this.children.forEach(child => {
-      child.destroy()
-    })
-  }
-}
+setup({ Rax })

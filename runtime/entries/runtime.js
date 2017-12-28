@@ -26,9 +26,9 @@
 
 import * as shared from '../shared'
 
-import init from './api/init'
-import config from './api/config'
-import { register, unregister, has } from './api/service'
+import init from '../api/init'
+import config from '../api/config'
+import { register, unregister, has } from '../api/service'
 
 /* istanbul ignore next */
 function freezePrototype () {

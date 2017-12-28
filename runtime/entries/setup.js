@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import { subversion } from '../../../package.json'
-import runtime from '../../runtime'
-import services from '../../services/index'
+import { subversion } from '../../package.json'
+import runtime from './runtime'
+import services from '../services'
 
 /**
  * Setup frameworks with runtime.
