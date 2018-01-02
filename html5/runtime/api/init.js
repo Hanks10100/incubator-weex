@@ -97,6 +97,7 @@ function createInstanceContext (id, options = {}, data) {
   const runtimeContext = Object.create(null)
   Object.assign(runtimeContext, services, {
     weex,
+    __WEEX_CALL_JAVASCRIPT__: receiveTasks,
     services // Temporary compatible with some legacy APIs in Rax
   })
   Object.freeze(runtimeContext)
