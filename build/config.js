@@ -46,6 +46,14 @@ const configs = {
         + frameworkBanner
     }
   },
+  'weex-shared': {
+    input: absolute('runtime/entries/shared.js'),
+    output: {
+      name: 'PrepareWeexSharedAPIs',
+      file: absolute('pre-build/weex-shared'),
+      banner: `/* Prepare Weex Shared APIs ${subversion.framework}, Build ${now()}. */\n\n`
+    }
+  },
   'weex-vue': {
     input: absolute('runtime/entries/vue.js'),
     output: {

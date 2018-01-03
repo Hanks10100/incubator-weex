@@ -37,6 +37,7 @@
   "scripts": {
     "postinstall": "bash ./scripts/install-hooks.sh",
     "build:native": "node build/build.js native",
+    "build:shared": "node build/build.js shared",
     "build:vue": "node build/build.js vue",
     "build:rax": "node build/build.js rax",
     "build:runtime": "node build/build.js runtime",

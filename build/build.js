@@ -71,7 +71,9 @@ async function runRollup (config) {
 async function build (name) {
   let pkgName = 'weex-js-framework'
   switch (name) {
+    case 'jsfm':
     case 'native': pkgName = 'weex-js-framework'; break
+    case 'shared': pkgName = 'weex-shared'; break
     case 'vue': pkgName = 'weex-vue'; break
     case 'rax': pkgName = 'weex-rax'; break
     case 'runtime': pkgName = 'weex-js-runtime'; break
