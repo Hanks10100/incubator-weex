@@ -84,12 +84,14 @@ const configs = {
       banner: `/* Weex JS Runtime ${subversion.framework}, Build ${now()}. */\n\n`
     }
   },
-  'weex-legacy-framework': {
-    input: absolute('runtime/frameworks/legacy/index.js'),
+  'weex-legacy': {
+    input: absolute('runtime/entries/legacy.js'),
     output: {
-      name: 'WeexLegacyFramework',
-      file: absolute('packages/weex-legacy-framework/index'),
-      banner: `/* Weex Legacy Framework ${subversion.framework}, Build ${now()}. */\n`
+      name: 'WeexLegacy',
+      file: absolute('pre-build/weex-legacy'),
+      banner: `(this.nativeLog || function(s) {console.log(s)})`
+        + `('Weex Legacy Framework ${subversion.framework}, Build ${now()}.');\n`
+        + frameworkBanner
     }
   },
   'weex-vanilla-framework': {
