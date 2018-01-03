@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import './shared'
 import setup from './setup'
 import frameworks from '../frameworks'
 

@@ -129,7 +129,7 @@ function getConfig (name, minify, es6) {
         'process.env.SUPPORT_ES2015': !!es6,
         'process.env.NODE_DEBUG': false
       }),
-      commonjs()
+      commonjs({ ignoreGlobal: true })
     ])
   }
   if (!es6) {
