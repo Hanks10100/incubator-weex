@@ -108,9 +108,6 @@ function createInstanceContext (id, options = {}, data) {
   const runtimeContext = Object.create(null)
   Object.assign(runtimeContext, services, {
     weex,
-    __register_static_styles__ (...args) {
-      weex.document.registerStyleSheets(...args)
-    },
     services // Temporary compatible with some legacy APIs in Rax
   })
   Object.freeze(runtimeContext)

@@ -153,16 +153,16 @@ export default class Document {
   * @param {string} scopeId
   * @return {array<object>} styleSheets
   */
-  registerStyleSheets (scopeId, styleSheets) {
-    const sheets = Array.isArray(styleSheets) ? styleSheets : [styleSheets]
-    if (this.taskCenter && sheets.length) {
-      return this.taskCenter.send(
-        'dom',
-        { action: 'registerStyleSheets' },
-        [scopeId, sheets]
-      )
-    }
-  }
+  // registerStyleSheets (scopeId, styleSheets) {
+  //   const sheets = Array.isArray(styleSheets) ? styleSheets : [styleSheets]
+  //   if (this.taskCenter && sheets.length) {
+  //     return this.taskCenter.send(
+  //       'dom',
+  //       { action: 'registerStyleSheets' },
+  //       [scopeId, sheets]
+  //     )
+  //   }
+  // }
 
   /**
   * Fire an event on specified element manually.

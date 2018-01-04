@@ -37,7 +37,7 @@
   "scripts": {
     "postinstall": "bash ./scripts/install-hooks.sh",
     "build:native": "node build/build.js native",
-    "build:shared": "node build/build.js shared",
+    "build:shared": "WEEX_FREEZE=true node build/build.js shared",
     "build:vue": "node build/build.js vue",
     "build:rax": "node build/build.js rax",
     "build:runtime": "node build/build.js runtime",
@@ -85,7 +85,7 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.4.20",
-    "weex-vue-framework": "2.5.11-weex.1"
+    "weex-vue-framework": "2.5.11-weex.2"
   },
   "devDependencies": {
     "@weex-project/weex-picker": "^0.2.4",

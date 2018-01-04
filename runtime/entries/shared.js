@@ -17,11 +17,11 @@
  * under the License.
  */
 
-import * as shared from '../shared'
+import { setNativeConsole, freezePrototype } from '../shared'
+export * from '../shared'
 
-export default function prepareContext () {
-  shared.setNativeConsole()
-  shared.freezePrototype()
+setNativeConsole()
+
+if (process.env.WEEX_FREEZE) {
+  freezePrototype()
 }
-
-prepareContext()

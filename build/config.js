@@ -52,6 +52,7 @@ const configs = {
       name: 'PrepareWeexSharedAPIs',
       file: absolute('pre-build/weex-shared'),
       banner: `/* Prepare Weex Shared APIs ${subversion.framework}, Build ${now()}. */\n\n`
+        + `var global = this; var process = {env:{}};`
     }
   },
   'weex-vue': {
@@ -126,6 +127,7 @@ function getConfig (name, minify, es6) {
         '__WEEX_VERSION__': JSON.stringify(subversion.framework),
         'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
+        'process.env.WEEX_FREEZE': JSON.stringify(!!process.env.WEEX_FREEZE),
         'process.env.SUPPORT_ES2015': !!es6,
         'process.env.NODE_DEBUG': false
       }),
@@ -144,7 +146,7 @@ function getConfig (name, minify, es6) {
   }
   else {
     config.output.sourcemap = 'inline'
-    config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
+    // config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }
   return config
 }

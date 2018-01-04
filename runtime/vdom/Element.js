@@ -399,22 +399,22 @@ export default class Element extends Node {
    * Set class list.
    * @param {array} classList
    */
-  setClassList (classList) {
-    const classes = typeof classList === 'string'
-      ? classList.split(/\s+/)
-      : Array.from(classList)
-    if (Array.isArray(classes) && classes.length > 0) {
-      this.classList = classes
-      const taskCenter = getTaskCenter(this.docId)
-      if (taskCenter) {
-        taskCenter.send(
-          'dom',
-          { action: 'updateClassList' },
-          [this.ref, this.classList.slice()]
-        )
-      }
-    }
-  }
+  // setClassList (classList) {
+  //   const classes = typeof classList === 'string'
+  //     ? classList.split(/\s+/)
+  //     : Array.from(classList)
+  //   if (Array.isArray(classes) && classes.length > 0) {
+  //     this.classList = classes
+  //     const taskCenter = getTaskCenter(this.docId)
+  //     if (taskCenter) {
+  //       taskCenter.send(
+  //         'dom',
+  //         { action: 'updateClassList' },
+  //         [this.ref, this.classList.slice()]
+  //       )
+  //     }
+  //   }
+  // }
 
   /**
    * Add an event handler.
