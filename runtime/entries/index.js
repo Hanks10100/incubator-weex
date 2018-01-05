@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { freezePrototype } from './shared'
+import { freezePrototype } from './env'
 import setup from './setup'
 import frameworks from '../frameworks'
 

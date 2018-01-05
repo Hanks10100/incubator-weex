@@ -46,12 +46,12 @@ const configs = {
         + frameworkBanner
     }
   },
-  'weex-shared': {
-    input: absolute('runtime/entries/shared.js'),
+  'weex-env': {
+    input: absolute('runtime/entries/env.js'),
     output: {
-      name: 'PrepareWeexSharedAPIs',
-      file: absolute('pre-build/weex-shared'),
-      banner: `/* Prepare Weex Shared APIs ${subversion.framework}, Build ${now()}. */\n\n`
+      name: 'WeexEnvironmentAPIs',
+      file: absolute('pre-build/weex-env'),
+      banner: `/* Prepare Weex Environment APIs ${subversion.framework}, Build ${now()}. */\n\n`
         + `var global = this; var process = {env:{}};`
     }
   },
@@ -118,7 +118,8 @@ function getConfig (name, minify, es6) {
       name: output.name,
       file: output.file + suffix,
       format: output.format || 'umd',
-      banner: output.banner
+      banner: output.banner,
+      sourcemap: true
     },
     plugins: opt.plugins.concat([
       nodeResolve({ jsnext: true, main: true }),
@@ -138,15 +139,13 @@ function getConfig (name, minify, es6) {
     config.plugins.push(buble())
   }
   if (minify) {
-    config.output.sourcemap = true
     config.plugins.push(es6
       ? uglify({ safari10: true, toplevel: true }, uglifyES.minify)
       : uglify()
     )
   }
   else {
-    config.output.sourcemap = 'inline'
-    // config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
+    config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }
   return config
 }
