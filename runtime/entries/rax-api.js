@@ -17,7 +17,6 @@
  * under the License.
  */
 
-import setup from './setup'
-import * as Rax from '@ali/weex-rax-framework-yc'
+import RaxAPI from '@ali/weex-rax-framework-yc/dist/api'
 
-setup({ Rax })
+RaxAPI.injectContext()

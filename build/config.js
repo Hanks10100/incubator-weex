@@ -77,6 +77,15 @@ const configs = {
         + frameworkBanner
     }
   },
+  'weex-rax-api': {
+    input: absolute('runtime/entries/rax-api.js'),
+    output: {
+      name: 'WeexRaxEnvironmentAPIs',
+      file: absolute('pre-build/weex-rax-api'),
+      banner: `/* Prepare Rax Environment APIs ${deps['weex-rax-framework']}, Build ${now()}. */\n\n`
+        + `var global = this; var process = {env:{}};`
+    }
+  },
   'weex-js-runtime': {
     input: absolute('runtime/api/index.js'),
     output: {
