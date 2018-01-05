@@ -1,4 +1,4 @@
-/* Prepare Weex Environment APIs 0.24.0, Build 2018-01-05 12:19. */
+/* Prepare Weex Environment APIs 0.24.0, Build 2018-01-05 18:16. */
 
 var global = this; var process = {env:{}};
 (function (global, factory) {

@@ -1,4 +1,4 @@
-(this.nativeLog || function(s) {console.log(s)})('Weex JS Framework 0.24.0, Build 2018-01-05 12:20. (Vue: 2.5.11-weex.2)');
+(this.nativeLog || function(s) {console.log(s)})('Weex JS Framework 0.24.0, Build 2018-01-05 18:17. (Vue: 2.5.11-weex.2)');
 ;(this.getJSFMVersion = function(){return "0.24.0"});
 var global = this; var process = {env:{}}; var setTimeout = global.setTimeout;
 
