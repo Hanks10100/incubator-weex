@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import { decodePrimitive } from './normalize'
-
 function getHookKey (componentId, type, hookName) {
   return `${type}@${hookName}#${componentId}`
 }
@@ -78,7 +76,7 @@ export default class CallbackManager {
       delete this.callbacks[callbackId]
     }
     if (typeof callback === 'function') {
-      return callback(decodePrimitive(data))
+      return callback(data)
     }
     return new Error(`invalid callback id "${callbackId}"`)
   }
