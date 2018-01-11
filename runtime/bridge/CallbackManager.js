@@ -53,7 +53,7 @@ export default class CallbackManager {
     }
     this.hooks[key] = hookFunction
   }
-  triggerHook (componentId, type, hookName, options = {}) {
+  triggerHook (componentId, type, hookName, args) {
     // TODO: validate arguments
     const key = getHookKey(componentId, type, hookName)
     const hookFunction = this.hooks[key]
@@ -63,7 +63,7 @@ export default class CallbackManager {
     }
     let result = null
     try {
-      result = hookFunction.apply(null, options.args || [])
+      result = hookFunction.apply(null, args || [])
     }
     catch (e) {
       console.error(`[JS Framework] Failed to execute the hook function on "${key}".`)
