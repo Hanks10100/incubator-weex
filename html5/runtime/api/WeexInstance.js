@@ -79,6 +79,7 @@ export default class WeexInstance {
     }
 
     // create new module proxy
+    console.log(' => weex.requireModule ', moduleName, Object.prototype.toString.apply(moduleName))
     const proxyName = `${moduleName}#${id}`
     if (!moduleProxies[proxyName]) {
       // create registered module apis
@@ -94,20 +95,26 @@ export default class WeexInstance {
       }
 
       // create module Proxy
-      if (typeof Proxy === 'function') {
-        moduleProxies[proxyName] = new Proxy(moduleApis, {
-          get (target, methodName) {
-            if (methodName in target) {
-              return target[methodName]
+      console.log(' => create new module proxy ', proxyName)
+      if (typeof Proxy === 'function' && /native code/.test(Proxy.toString())) {
+        try {
+          console.log(' => try to use ES6 Proxy ', proxyName)
+          moduleProxies[proxyName] = new Proxy(moduleApis, {
+            get (target, methodName) {
+              if (methodName in target) {
+                return target[methodName]
+              }
+              console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
+              return moduleGetter(id, moduleName, methodName)
             }
-            console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
-            return moduleGetter(id, moduleName, methodName)
-          }
-        })
+          })
+        } catch (e) {
+          console.log('[JS Framework] Failed to create ES6 Proxy module.')
+        }
       }
-      else {
-        moduleProxies[proxyName] = moduleApis
-      }
+
+      console.log(' => always use normal object ', proxyName)
+      moduleProxies[proxyName] = moduleApis
     }
 
     return moduleProxies[proxyName]
