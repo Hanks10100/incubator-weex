@@ -30,9 +30,11 @@ const packageJSON = require('../package.json')
 const deps = packageJSON.dependencies
 const subversion = packageJSON.subversion
 
-const frameworkBanner = `;(this.getJSFMVersion = function()`
-  + `{return "${subversion.framework}"});\n`
-  + `var global = this; var process = {env:{}}; var setTimeout = global.setTimeout;\n`
+// const frameworkBanner = `;(this.getJSFMVersion = function()`
+//   + `{return "${subversion.framework}"});\n`
+//   + `var global = this; var process = {env:{}}; var setTimeout = global.setTimeout;\n`
+const frameworkBanner = `var global=this; var process={env:{}}; `
+  + `var setTimeout=global.setTimeout;\n`
 
 const configs = {
   'weex-js-framework': {
@@ -134,7 +136,8 @@ function getConfig (name, minify, es6) {
       nodeResolve({ jsnext: true, main: true }),
       json(),
       replace({
-        '__WEEX_VERSION__': JSON.stringify(subversion.framework),
+        '__WEEX_VERSION__': JSON.stringify(packageJSON.version),
+        '__WEEX_JS_FRAMEWORK_VERSION__': JSON.stringify(subversion.framework),
         'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
         'process.env.WEEX_FREEZE': JSON.stringify(!!process.env.WEEX_FREEZE),
