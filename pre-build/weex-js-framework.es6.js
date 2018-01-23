@@ -1,6 +1,5 @@
-(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.0, Build 2018-01-05 18:16. (Vue: 2.5.11-weex.2, Rax: 0.4.20)');
-;(this.getJSFMVersion = function(){return "0.24.0"});
-var global = this; var process = {env:{}}; var setTimeout = global.setTimeout;
+(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.1, Build 2018-01-24 16:37. (Vue: 2.5.13-weex.0, Rax: 0.4.20)');
+var global=this; var process={env:{}}; var setTimeout=global.setTimeout;
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
@@ -335,169 +334,7 @@ function freezeProtoProperty (proto, propertyName, protoName) {
 
 setNativeConsole();
 
-var subversion = {"framework":"0.24.0","transformer":">=0.1.5 <0.5"};
-
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-/**
- * Get a unique id.
- */
-let nextNodeRef = 1;
-function uniqueId () {
-  return (nextNodeRef++).toString()
-}
-
-function typof (v) {
-  const s = Object.prototype.toString.call(v);
-  return s.substring(8, s.length - 1)
-}
-
-function bufferToBase64 (buffer) {
-  if (typeof btoa !== 'function') {
-    return ''
-  }
-  const string = Array.prototype.map.call(
-    new Uint8Array(buffer),
-    code => String.fromCharCode(code)
-  ).join('');
-  return btoa(string) // eslint-disable-line no-undef
-}
-
-function base64ToBuffer (base64) {
-  if (typeof atob !== 'function') {
-    return new ArrayBuffer(0)
-  }
-  const string = atob(base64); // eslint-disable-line no-undef
-  const array = new Uint8Array(string.length);
-  Array.prototype.forEach.call(string, (ch, i) => {
-    array[i] = ch.charCodeAt(0);
-  });
-  return array.buffer
-}
-
-/**
- * Detect if the param is falsy or empty
- * @param {any} any
- */
-function isEmpty (any) {
-  if (!any || typeof any !== 'object') {
-    return true
-  }
-
-  for (const key in any) {
-    if (Object.prototype.hasOwnProperty.call(any, key)) {
-      return false
-    }
-  }
-  return true
-}
-
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-/**
- * Normalize a primitive value.
- * @param  {any}        v
- * @return {primitive}
- */
-function normalizePrimitive (v) {
-  const type = typof(v);
-
-  switch (type) {
-    case 'Undefined':
-    case 'Null':
-      return ''
-
-    case 'RegExp':
-      return v.toString()
-    case 'Date':
-      return v.toISOString()
-
-    case 'Number':
-    case 'String':
-    case 'Boolean':
-    case 'Array':
-    case 'Object':
-      return v
-
-    case 'ArrayBuffer':
-      return {
-        '@type': 'binary',
-        dataType: type,
-        base64: bufferToBase64(v)
-      }
-
-    case 'Int8Array':
-    case 'Uint8Array':
-    case 'Uint8ClampedArray':
-    case 'Int16Array':
-    case 'Uint16Array':
-    case 'Int32Array':
-    case 'Uint32Array':
-    case 'Float32Array':
-    case 'Float64Array':
-      return {
-        '@type': 'binary',
-        dataType: type,
-        base64: bufferToBase64(v.buffer)
-      }
-
-    default:
-      return JSON.stringify(v)
-  }
-}
-
-function decodePrimitive (data) {
-  if (typof(data) === 'Object') {
-    // decode base64 into binary
-    if (data['@type'] && data['@type'] === 'binary') {
-      return base64ToBuffer(data.base64 || '')
-    }
-
-    const realData = {};
-    for (const key in data) {
-      realData[key] = decodePrimitive(data[key]);
-    }
-    return realData
-  }
-  if (typof(data) === 'Array') {
-    return data.map(decodePrimitive)
-  }
-  return data
-}
+var subversion = {"framework":"0.24.1","transformer":">=0.1.5 <0.5"};
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -554,17 +391,18 @@ class CallbackManager {
     }
     this.hooks[key] = hookFunction;
   }
-  triggerHook (componentId, type, hookName, options = {}) {
+  triggerHook (componentId, type, hookName, args) {
     // TODO: validate arguments
     const key = getHookKey(componentId, type, hookName);
     const hookFunction = this.hooks[key];
+    console.log(` => trigger hook ${key} (${JSON.stringify(args)}).`);
     if (typeof hookFunction !== 'function') {
       console.error(`[JS Framework] Invalid hook function type (${typeof hookFunction}) on "${key}".`);
       return null
     }
     let result = null;
     try {
-      result = hookFunction.apply(null, options.args || []);
+      result = hookFunction.apply(null, args || []);
     }
     catch (e) {
       console.error(`[JS Framework] Failed to execute the hook function on "${key}".`);
@@ -577,7 +415,7 @@ class CallbackManager {
       delete this.callbacks[callbackId];
     }
     if (typeof callback === 'function') {
-      return callback(decodePrimitive(data))
+      return callback(data)
     }
     return new Error(`invalid callback id "${callbackId}"`)
   }
@@ -585,6 +423,68 @@ class CallbackManager {
     this.callbacks = {};
     this.hooks = {};
   }
+}
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/**
+ * Get a unique id.
+ */
+let nextNodeRef = 1;
+function uniqueId () {
+  return (nextNodeRef++).toString()
+}
+
+function typof (v) {
+  const s = Object.prototype.toString.call(v);
+  return s.substring(8, s.length - 1)
+}
+
+function bufferToBase64 (buffer) {
+  if (typeof btoa !== 'function') {
+    return ''
+  }
+  const string = Array.prototype.map.call(
+    new Uint8Array(buffer),
+    code => String.fromCharCode(code)
+  ).join('');
+  return btoa(string) // eslint-disable-line no-undef
+}
+
+
+
+/**
+ * Detect if the param is falsy or empty
+ * @param {any} any
+ */
+function isEmpty (any) {
+  if (!any || typeof any !== 'object') {
+    return true
+  }
+
+  for (const key in any) {
+    if (Object.prototype.hasOwnProperty.call(any, key)) {
+      return false
+    }
+  }
+  return true
 }
 
 /*
@@ -1451,6 +1351,7 @@ class Element extends Node {
       this.parentNode.fireEvent(type, event, isBubble); // no options
     }
 
+    console.log(` => fire event ${type} #${this.ref}`);
     return result
   }
 
@@ -1514,6 +1415,77 @@ class Element extends Node {
 }
 
 setElement(Element);
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/**
+ * Normalize a primitive value.
+ * @param  {any}        v
+ * @return {primitive}
+ */
+function normalizePrimitive (v) {
+  const type = typof(v);
+
+  switch (type) {
+    case 'Undefined':
+    case 'Null':
+      return ''
+
+    case 'RegExp':
+      return v.toString()
+    case 'Date':
+      return v.toISOString()
+
+    case 'Number':
+    case 'String':
+    case 'Boolean':
+    case 'Array':
+    case 'Object':
+      return v
+
+    case 'ArrayBuffer':
+      return {
+        '@type': 'binary',
+        dataType: type,
+        base64: bufferToBase64(v)
+      }
+
+    case 'Int8Array':
+    case 'Uint8Array':
+    case 'Uint8ClampedArray':
+    case 'Int16Array':
+    case 'Uint16Array':
+    case 'Int32Array':
+    case 'Uint32Array':
+    case 'Float32Array':
+    case 'Float64Array':
+      return {
+        '@type': 'binary',
+        dataType: type,
+        base64: bufferToBase64(v.buffer)
+      }
+
+    default:
+      return JSON.stringify(v)
+  }
+}
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -1688,14 +1660,14 @@ function callback (document, callbackId, data, ifKeepAlive) {
   return document.taskCenter.callback(callbackId, data, ifKeepAlive)
 }
 
-function componentHook (document, componentId, type, hook, options) {
+function componentHook (document, componentId, type, hook, args) {
   if (!document || !document.taskCenter) {
     console.error(`[JS Framework] Can't find "document" or "taskCenter".`);
     return null
   }
   let result = null;
   try {
-    result = document.taskCenter.triggerHook(componentId, type, hook, options);
+    result = document.taskCenter.triggerHook(componentId, type, hook, args);
   }
   catch (e) {
     console.error(`[JS Framework] Failed to trigger the "${type}@${hook}" hook on ${componentId}.`);
@@ -2601,20 +2573,18 @@ class WeexInstance {
       }
 
       // create module Proxy
-      if (typeof Proxy === 'function') {
-        moduleProxies[proxyName] = new Proxy(moduleApis, {
-          get (target, methodName) {
-            if (methodName in target) {
-              return target[methodName]
-            }
-            console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`);
-            return moduleGetter(id, moduleName, methodName)
-          }
-        });
-      }
-      else {
-        moduleProxies[proxyName] = moduleApis;
-      }
+      // if (typeof Proxy === 'function') {
+      //   moduleProxies[proxyName] = new Proxy(moduleApis, {
+      //     get (target, methodName) {
+      //       if (methodName in target) {
+      //         return target[methodName]
+      //       }
+      //       console.warn(`[JS Framework] using unregistered method "${moduleName}.${methodName}"`)
+      //       return moduleGetter(id, moduleName, methodName)
+      //     }
+      //   })
+      // }
+      moduleProxies[proxyName] = moduleApis;
     }
 
     return moduleProxies[proxyName]
@@ -2689,6 +2659,14 @@ function getBundleType (code) {
   return 'Weex'
 }
 
+/**
+ * Get js framework version at runtime.
+ */
+function getJSFMVersion () {
+  // It will be converted into a version string at build time
+  return "0.24.1" // eslint-disable-line
+}
+
 function createServices (id, env, config) {
   // Init JavaScript services for this instance.
   const serviceMap = Object.create(null);
@@ -2745,6 +2723,8 @@ function createInstanceContext (id, options = {}, data) {
   const runtimeContext = Object.create(null);
   Object.assign(runtimeContext, services$$1, {
     weex,
+    getJSFMVersion,
+    __WEEX_CALL_JAVASCRIPT__: receiveTasks,
     services: services$$1 // Temporary compatible with some legacy APIs in Rax
   });
   Object.freeze(runtimeContext);
@@ -2853,6 +2833,7 @@ const methods = {
   createInstance,
   createInstanceContext,
   getRoot,
+  getJSFMVersion,
   getDocument: getDoc,
   registerService: register,
   unregisterService: unregister,
@@ -4195,7 +4176,9 @@ function cloneVNode (vnode) {
  */
 
 var arrayProto = Array.prototype;
-var arrayMethods = Object.create(arrayProto);[
+var arrayMethods = Object.create(arrayProto);
+
+var methodsToPatch = [
   'push',
   'pop',
   'shift',
@@ -4203,7 +4186,12 @@ var arrayMethods = Object.create(arrayProto);[
   'splice',
   'sort',
   'reverse'
-].forEach(function (method) {
+];
+
+/**
+ * Intercept mutating methods and emit events
+ */
+methodsToPatch.forEach(function (method) {
   // cache original method
   var original = arrayProto[method];
   def(arrayMethods, method, function mutator () {
@@ -7446,21 +7434,45 @@ function updateComponentData (
   warn(("Failed to update component data (" + componentId + ")."));
 }
 
+// export function updateRecycleListData (
+//   el: VNode,
+//   data: Array<any> | Object,
+//   index?: number
+// ) {
+//   if (!document || !document.taskCenter) {
+//     warn(`Can't find available "document" or "taskCenter".`)
+//     return
+//   }
+//   if (typeof document.taskCenter.updateRecycleListData === 'function') {
+//     return document.taskCenter.updateRecycleListData(el, data, index)
+//   }
+//   warn(`Failed to update recycle list data.`)
+// }
+
 /*  */
 
 // https://github.com/Hanks10100/weex-native-directive/tree/master/component
 
 var uid$3 = 0;
 
+function getInitialData (vm) {
+  var _data = vm.$options.data;
+  return typeof _data === 'function'
+    ? getData(_data, vm)
+    : _data || {}
+}
+
 // override Vue.prototype._init
 function initVirtualComponent (options) {
-  if ( options === void 0 ) options = {};
+  var obj;
 
+  if ( options === void 0 ) options = {};
   var vm = this;
   var componentId = options.componentId;
+  console.log((" => create virtual component " + componentId));
 
   // virtual component uid
-  vm._uid = "virtual-component-" + (uid$3++);
+  vm._uid = componentId || ("virtual-component-" + (uid$3++));
 
   // a flag to avoid this being observed
   vm._isVue = true;
@@ -7494,22 +7506,23 @@ function initVirtualComponent (options) {
   initProvide(vm); // resolve provide after data/props
   callHook(vm, 'created');
 
-  // send initial data to native
-  var data = vm.$options.data;
-  var params = typeof data === 'function'
-    ? getData(data, vm)
-    : data || {};
-  if (isPlainObject(params)) {
-    updateComponentData(componentId, params);
-  }
-
-  registerComponentHook(componentId, 'lifecycle', 'attach', function () {
+  registerComponentHook(String(vm._uid), 'lifecycle', 'attach', function () {
     callHook(vm, 'beforeMount');
 
     var updateComponent = function () {
       vm._update(vm._vnode, false);
     };
     new Watcher(vm, updateComponent, noop, null, true);
+
+    // watch all keys in data and send mutation to native
+    var data = getInitialData(vm);
+    if (isPlainObject(data)) {
+      Object.keys(data).forEach(function (key) {
+        vm.$watch(key, function (newValue) {
+          updateComponentData(String(vm._uid), ( obj = {}, obj[key] = newValue, obj));
+        }, { deep: true });
+      });
+    }
 
     vm._isMounted = true;
     callHook(vm, 'mounted');
@@ -7577,39 +7590,42 @@ function resolveVirtualComponent (vnode) {
   VirtualComponent.prototype._update = updateVirtualComponent;
 
   vnode.componentOptions.Ctor = BaseCtor.extend({
-    name: '',
     methods: {
       registerVirtualComponent: function registerVirtualComponent () {
         var vm = this;
-
-        // TODO: listen on all events and dispatch them to the
-        // corresponding virtual components according to the componentId.
-        vm._virtualComponents = {};
-        var createVirtualComponent = function (componentId, propsData) {
-          // create virtual component
-          var subVm = new VirtualComponent({
-            componentId: componentId,
-            propsData: propsData
-          });
-          subVm._uid = componentId;
-          if (vm._virtualComponents) {
-            vm._virtualComponents[componentId] = subVm;
-          }
-        };
+        def(vm, '_virtualComponents', {});
 
         registerComponentHook(
           String(vm._uid),
           'lifecycle',
           'create',
-          createVirtualComponent
+
+          // create virtual component
+          function (componentId, propsData) {
+            var subVm = new VirtualComponent({
+              componentId: componentId,
+              propsData: propsData
+            });
+            // subVm._uid = componentId
+            if (vm._virtualComponents) {
+              vm._virtualComponents[componentId] = subVm;
+            }
+
+            // send initial data to native
+            var data = getInitialData(subVm);
+            console.log((" => initial data " + (JSON.stringify(data))));
+            return data
+          }
         );
-      },
-      destroyVirtualComponents: function destroyVirtualComponents () {
-        delete this._virtualComponents;
       }
+    },
+    destroyed: function destroyed () {
+      console.log((" => destroy virtual component " + (this._uid)));
+      delete this._virtualComponents;
     }
   });
   vnode.componentOptions.Ctor.prototype._init = initVirtualComponentTemplate;
+  vnode.componentOptions.Ctor.prototype._update = noop;
 }
 
 /*  */
@@ -7912,11 +7928,11 @@ function _createElement (
   normalizationType
 ) {
   if (isDef(data) && isDef((data).__ob__)) {
-    "development" !== 'production' && warn(
-      "Avoid using observed data object as vnode data: " + (JSON.stringify(data)) + "\n" +
-      'Always create fresh vnode data objects in each render!',
-      context
-    );
+    // "development" !== 'production' && warn(
+    //   `Avoid using observed data object as vnode data: ${JSON.stringify(data)}\n` +
+    //   'Always create fresh vnode data objects in each render!',
+    //   context
+    // )
     return createEmptyVNode()
   }
   // object syntax in v-bind
@@ -7931,13 +7947,13 @@ function _createElement (
   if ("development" !== 'production' &&
     isDef(data) && isDef(data.key) && !isPrimitive(data.key)
   ) {
-    if (!true || !('@binding' in data.key)) {
-      warn(
-        'Avoid using non-primitive value as key, ' +
-        'use string/number value instead.',
-        context
-      );
-    }
+    // if (!true || !('@binding' in data.key)) {
+    //   warn(
+    //     'Avoid using non-primitive value as key, ' +
+    //     'use string/number value instead.',
+    //     context
+    //   )
+    // }
   }
   // support single function children as default scoped slot
   if (Array.isArray(children) &&
@@ -7999,7 +8015,8 @@ function applyNS (vnode, ns, force) {
   if (isDef(vnode.children)) {
     for (var i = 0, l = vnode.children.length; i < l; i++) {
       var child = vnode.children[i];
-      if (isDef(child.tag) && (isUndef(child.ns) || isTrue(force))) {
+      if (isDef(child.tag) && (
+        isUndef(child.ns) || (isTrue(force) && child.tag !== 'svg'))) {
         applyNS(child, ns, force);
       }
     }
@@ -9831,6 +9848,22 @@ var klass = {
 var target$1;
 var targetContext;
 
+function invokeHandler (invoker, args, context) {
+  if ( context === void 0 ) context = null;
+
+  var fns = invoker.fns;
+  if (Array.isArray(fns)) {
+    var cloned = fns.slice();
+    for (var i = 0; i < cloned.length; i++) {
+      cloned[i].apply(context, args);
+    }
+  } else if (typeof fns === 'function') {
+    return fns.apply(context, args)
+  } else {
+    return invoker.apply(context, args)
+  }
+}
+
 function add$1 (
   event,
   handler,
@@ -9855,27 +9888,31 @@ function add$1 (
       }
     };
   }
-  // TODO: implement virtual component template handler
+
+  // create virtual component template handler
   if (targetContext && targetContext._virtualComponents) {
     target$1._context = targetContext;
-    var normalHandler = handler;
-    handler = function (evt) {
-      var args = [], len = arguments.length - 1;
-      while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+    var formerHandler = handler;
+    handler = function virtualHandler () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
 
-      var componentId = evt.componentId;
-      if (componentId) {
-        var virtualComponents = this._context._virtualComponents || {};
-        var realTarget = virtualComponents[componentId];
-        if (realTarget) {
-          // TODO: rebind normalHandler to realTarget
-          normalHandler.call(realTarget, evt);
-          return
-        }
+      var componentId = (args[0] || {}).componentId;
+      console.log((" => enter virtual handler " + componentId));
+      var context = this._context;
+      if (componentId && this._context) {
+        var vcs = this._context._virtualComponents || {};
+        context = vcs[componentId] || context;
       }
-      normalHandler(evt);
+      try {
+        console.log((" => invoke virtual event handler " + (context._uid)));
+        invokeHandler(formerHandler, args, context);
+      } catch (err) {
+        handleError(err, context);
+      }
     };
   }
+
   target$1.addEvent(event, handler, params);
 }
 
@@ -10346,6 +10383,78 @@ var platformDirectives = {
 
 /*  */
 
+function watchArray (parentVm, vm, array) {
+  if (!Array.isArray(array)) {
+    return noop
+  }
+  var unwatches = array.map(function (item) {
+    if (!isPlainObject(item) || hasOwn(item, '[[Watched]]')) {
+      return noop
+    }
+    def(item, '[[Watched]]', true);
+    return parentVm.$watch(function () {
+      var str;
+      for (var k in item) {
+        str = item[k];
+      }
+      return str
+    }, function () {
+      var updateListItem = vm.$el.updateData || (function (index) {
+        warn(("Failed to update list item data at " + index + "!"));
+      });
+      updateListItem.call(vm.$el, array.indexOf(item), item);
+    }, { deep: true })
+  });
+  return function () {
+    unwatches.forEach(function (unwatch) { return unwatch(); });
+  }
+}
+
+var RecycleList = {
+  name: 'recycle-list',
+  render: function render (h) {
+    var this$1 = this;
+
+    var parent = this.$options.parent;
+    var bindingKey = this.$attrs.bindingKey;
+    if (parent && bindingKey && !hasOwn(this.$options, '[[Watched]]')) {
+      def(this.$options, '[[Watched]]', true);
+      parent.$watch(bindingKey, function (newList) {
+        def(this$1.$options, '[[UseCache]]', true);
+      }, { deep: true });
+
+      var listData = this.$attrs.listData;
+      if (listData) {
+        watchArray(parent, this, listData);
+      }
+      parent.$watch(bindingKey, function (newList, old) {
+        watchArray(parent, this$1, newList);
+        // TODO: diff array
+        var updateList = this$1.$el.setListData || (function () { return warn('Failed to update list data!'); }
+        );
+        updateList.call(this$1.$el, newList);
+      });
+    }
+
+    if (this.$el && hasOwn(this.$options, '[[UseCache]]')) {
+      def(this.$options, '[[UseCache]]', false);
+      return this.$el
+    }
+    return h('weex:recycle-list', this.$slots.default)
+  },
+  renderError: function renderError (h, err) {
+    return h('text', {
+      style: {
+        fontSize: '36px',
+        color: '#FF0000'
+      },
+      value: err.toString()
+    })
+  }
+};
+
+/*  */
+
 function getVNodeType (vnode) {
   if (!vnode.tag) {
     return ''
@@ -10767,6 +10876,7 @@ var TransitionGroup = {
 // }
 
 var platformComponents = {
+  RecycleList: RecycleList,
   Richtext: Richtext,
   Transition: Transition$1,
   TransitionGroup: TransitionGroup
@@ -14070,6 +14180,9 @@ exports.SEMVER_SPEC_VERSION = '2.0.0';
 var MAX_LENGTH = 256;
 var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
 
+// Max safe segment length for coercion.
+var MAX_SAFE_COMPONENT_LENGTH = 16;
+
 // The actual regexps go on exports.re
 var re = exports.re = [];
 var src = exports.src = [];
@@ -14204,6 +14317,15 @@ var XRANGE = R++;
 src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$';
 var XRANGELOOSE = R++;
 src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$';
+
+// Coercion.
+// Extract anything that could conceivably be a part of a valid semver
+var COERCE = R++;
+src[COERCE] = '(?:^|[^\\d])' +
+              '(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '})' +
+              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
+              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
+              '(?:$|[^\\d])';
 
 // Tilde ranges.
 // Meaning is "reasonably at or greater than"
@@ -15343,6 +15465,22 @@ function intersects(r1, r2, loose) {
   r2 = new Range(r2, loose);
   return r1.intersects(r2)
 }
+
+exports.coerce = coerce;
+function coerce(version) {
+  if (version instanceof SemVer)
+    return version;
+
+  if (typeof version !== 'string')
+    return null;
+
+  var match = version.match(re[COERCE]);
+
+  if (match == null)
+    return null;
+
+  return parse((match[1] || '0') + '.' + (match[2] || '0') + '.' + (match[3] || '0')); 
+}
 });
 
 var semver_1 = semver.SEMVER_SPEC_VERSION;
@@ -15383,6 +15521,7 @@ var semver_35 = semver.gtr;
 var semver_36 = semver.outside;
 var semver_37 = semver.prerelease;
 var semver_38 = semver.intersects;
+var semver_39 = semver.coerce;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
