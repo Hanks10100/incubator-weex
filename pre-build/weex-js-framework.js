@@ -1,4 +1,4 @@
-(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.1, Build 2018-01-24 22:30. (Vue: 2.5.13-weex.0, Rax: 0.4.20)');
+(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.1, Build 2018-01-29 15:54. (Vue: 2.5.13-weex.2, Rax: 0.4.20)');
 var global=this; var process={env:{}}; var setTimeout=global.setTimeout;
 
 (function (global, factory) {
@@ -2403,7 +2403,6 @@ function registerElement (type, methods) {
 
   // Add methods to prototype.
   methods.forEach(function (methodName) {
-    // console.log(` => register component method ${type} ${methodName}`)
     WeexElement.prototype[methodName] = function () {
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
@@ -9091,7 +9090,7 @@ function initVirtualComponent (options) {
 
   var vm = this;
   var componentId = options.componentId;
-  console.log((" => create virtual component " + componentId));
+  def(vm, '_vmTemplate', options.vmTemplate);
 
   // virtual component uid
   vm._uid = componentId || ("virtual-component-" + (uid$3++));
@@ -9128,8 +9127,7 @@ function initVirtualComponent (options) {
   initProvide(vm); // resolve provide after data/props
   callHook(vm, 'created');
 
-  registerComponentHook(String(vm._uid), 'lifecycle', 'attach', function () {
-    console.log((" => attach virtual component " + componentId));
+  registerComponentHook(componentId, 'lifecycle', 'attach', function () {
     callHook(vm, 'beforeMount');
 
     new Watcher(
@@ -9142,9 +9140,17 @@ function initVirtualComponent (options) {
     callHook(vm, 'mounted');
   });
 
+  registerComponentHook(componentId, 'lifecycle', 'update', function () {
+    vm._update(vm._vnode, false);
+  });
+
   registerComponentHook(componentId, 'lifecycle', 'detach', function () {
-    console.log((" => detach virtual component " + componentId));
     vm.$destroy();
+    if (vm._vmTemplate) {
+      // $flow-disable-line
+      vm._vmTemplate.removeVirtualComponent(vm._uid);
+      delete vm._vmTemplate;
+    }
   });
 }
 
@@ -9159,7 +9165,6 @@ function updateVirtualComponent (vnode) {
   if (vm._isMounted && componentId) {
     // TODO: data should be diffed before sending to native
     var data = getComponentState(vm);
-    console.log((" => update component data " + componentId + " " + (JSON.stringify(data))));
     updateComponentData(componentId, data, function () {
       callHook(vm, 'updated');
     });
@@ -9202,8 +9207,23 @@ function initVirtualComponentTemplate (options) {
 function resolveVirtualComponent (vnode) {
   var BaseCtor = vnode.componentOptions.Ctor;
   var VirtualComponent = BaseCtor.extend({});
+  var originalEmit = VirtualComponent.prototype.$emit;
   VirtualComponent.prototype._init = initVirtualComponent;
   VirtualComponent.prototype._update = updateVirtualComponent;
+  VirtualComponent.prototype.$emit = function $emit () {
+    var arguments$1 = arguments;
+
+    var args = [], len = arguments.length;
+    while ( len-- ) { args[ len ] = arguments$1[ len ]; }
+
+    var componentId = this._uid;
+    var vmTemplate = this._vmTemplate;
+    if (componentId && vmTemplate) {
+      args.push(componentId);
+      originalEmit.apply(vmTemplate, args);
+    }
+    return originalEmit.apply(this, args)
+  };
 
   vnode.componentOptions.Ctor = BaseCtor.extend({
     methods: {
@@ -9219,6 +9239,7 @@ function resolveVirtualComponent (vnode) {
           // create virtual component
           function (componentId, propsData) {
             var subVm = new VirtualComponent({
+              vmTemplate: vm,
               componentId: componentId,
               propsData: propsData
             });
@@ -9231,6 +9252,9 @@ function resolveVirtualComponent (vnode) {
             return getComponentState(subVm)
           }
         );
+      },
+      removeVirtualComponent: function removeVirtualComponent (componentId) {
+        delete this._virtualComponents[componentId];
       }
     },
     destroyed: function destroyed () {
@@ -11519,7 +11543,7 @@ function add$1 (
         context = vcs[componentId] || context;
       }
       try {
-        console.log((" => invoke virtual handler " + (context._uid)));
+        // console.log(' -> invoke virtual handler', args)
         invokeHandler(formerHandler, args, context);
       } catch (err) {
         handleError(err, context, ("Failed to invoke virtual component handler (" + componentId + ")"));
@@ -11997,32 +12021,100 @@ var platformDirectives = {
 
 /*  */
 
-function watchArray (parentVm, vm, array) {
-  if (!Array.isArray(array)) {
-    return noop
-  }
-  var unwatches = array.map(function (item, index) {
-    if (!isPlainObject(item) || hasOwn(item, '[[Watched]]')) {
-      return noop
+var arrayKeys$1 = Object.getOwnPropertyNames(arrayMethods);
+
+/**
+ * Get method from Weex native component.
+ */
+function getComponentMethod (vm, name) {
+  var element = vm.$el;
+  if (element && typeof element[name] === 'function') {
+    return function () {
+      var arguments$1 = arguments;
+
+      var args = [], len = arguments.length;
+      while ( len-- ) { args[ len ] = arguments$1[ len ]; }
+
+      return element[name].apply(element, args);
     }
-    def(item, '[[Watched]]', true);
-    return parentVm.$watch(function () {
-      var str;
-      for (var k in item) {
-        str = item[k];
-      }
-      return str
-    }, function () {
-      var updateListItem = vm.$el.updateData || (function (i, x) {
-        warn(("Failed to update list item data at " + i + "!"));
-      });
-      console.log((" => update list item " + (array.indexOf(item)) + " " + index + " " + (JSON.stringify(item))));
-      updateListItem.call(vm.$el, array.indexOf(item), item);
-    }, { deep: true })
-  });
-  return function () {
-    unwatches.forEach(function (unwatch) { return unwatch(); });
   }
+  warn(("Can't find component method \"" + name + "\" on " + (element.type)));
+  return noop
+}
+
+/**
+ * Intercept mutating array methods and call the corresponding
+ * method which provided by Weex native component.
+ */
+function interceptArrayMethods (vm, array) {
+  var loop = function ( i, n ) {
+    var key = arrayKeys$1[i];
+    def(array, key, function recycleListArrayProxy () {
+      var arguments$1 = arguments;
+
+      var args = [], len = arguments.length;
+      while ( len-- ) { args[ len ] = arguments$1[ len ]; }
+
+      var length = this.length;
+
+      // update the array and notify changes
+      var method = arrayMethods[key];
+      if (typeof method === 'function') {
+        method.apply(this, args);
+      }
+
+      // send mutations to native
+      var remove$$1 = getComponentMethod(vm, 'removeData');
+      var insert = getComponentMethod(vm, 'insertRange');
+      var update = getComponentMethod(vm, 'setListData');
+      switch (key) {
+        case 'push': insert(length, args); break
+        case 'pop': remove$$1(length - 1, 1); break
+        case 'shift': remove$$1(0, 1); break
+        case 'unshift': insert(0, args); break
+        case 'splice': {
+          var start = args[0];
+          var count = args[1];
+          var items = args.slice(2);
+          remove$$1(start, count);
+          insert(start, items);
+        } break
+        case 'sort': update(this.slice()); break
+        case 'reverse': update(this.slice()); break
+      }
+    });
+  };
+
+  for (var i = 0, n = arrayKeys$1.length; i < n; i++) { loop( i, n ); }
+}
+
+/**
+ * Deep watch the array and convert the operations into
+ * Weex native directives.
+ */
+function watchArray (vm, array) {
+  if (!Array.isArray(array)) {
+    return
+  }
+  interceptArrayMethods(vm, array);
+
+  // deep watch all array items
+  array.forEach(function (item, index) {
+    if (isPlainObject(item) && !hasOwn(item, '[[Watched]]')) {
+      def(item, '[[Watched]]', true);
+      vm.$watch(
+        // visit all keys in item
+        function () { for (var k in item) { !item[k]; } },
+
+        // send new item data to native
+        function () {
+          var update = getComponentMethod(vm, 'updateData');
+          update(array.indexOf(item), item);
+        },
+        { deep: true }
+      );
+    }
+  });
 }
 
 var RecycleList = {
@@ -12030,35 +12122,31 @@ var RecycleList = {
   render: function render (h) {
     var this$1 = this;
 
-    if (this._vnode && hasOwn(this.$options, '[[UseCache]]')) {
+    if (this._vnode && this.$options['[[UseCache]]']) {
       def(this.$options, '[[UseCache]]', false);
       return this._vnode
     }
 
     var parent = this.$options.parent;
     var bindingKey = this.$attrs.bindingKey;
-    if (parent && bindingKey && !hasOwn(this.$options, '[[Watched]]')) {
-      def(this.$options, '[[Watched]]', true);
-      parent.$watch(bindingKey, function (newList) {
-        def(this$1.$options, '[[UseCache]]', true);
-      }, { deep: true, immediate: true });
+    if (parent && bindingKey) {
+      // prevent the re-render which caused by the binding list data
+      parent.$watch(
+        bindingKey,
+        function () { return def(this$1.$options, '[[UseCache]]', true); },
+        { deep: true, immediate: true }
+      );
 
-      var listData = this.$attrs.listData;
-      if (listData) {
-        watchArray(parent, this, listData);
-      }
-      parent.$watch(bindingKey, function (newList, old) {
-        this$1.$nextTick(function () {
-          // TODO: diff array
-          var updateList = this$1.$el.setListData || (function (_) { return warn('Failed to update list data!'); }
-          );
-          console.log((" => set list data " + (JSON.stringify(newList))));
-          updateList.call(this$1.$el, newList);
-        });
-        watchArray(parent, this$1, newList);
+      // watch the list data and send operations to native
+      watchArray(this, this.$attrs.listData);
+      parent.$watch(bindingKey, function (newList) {
+        watchArray(this$1, newList);
       });
     }
-    return h('weex:recycle-list', this.$slots.default)
+
+    return h('weex:recycle-list', {
+      on: this._events
+    }, this.$slots.default)
   },
   renderError: function renderError (h, err) {
     return h('text', {
