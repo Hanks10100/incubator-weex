@@ -1,4 +1,4 @@
-(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.1, Build 2018-01-29 15:54. (Vue: 2.5.13-weex.2, Rax: 0.4.20)');
+(this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK 0.24.1, Build 2018-01-30 14:26. (Vue: 2.5.13-weex.2, Rax: 0.4.20)');
 var global=this; var process={env:{}}; var setTimeout=global.setTimeout;
 
 (function (global, factory) {
@@ -3261,6 +3261,7 @@ function componentHook (document, componentId, type, hook, args) {
   catch (e) {
     console.error(("[JS Framework] Failed to trigger the \"" + type + "@" + hook + "\" hook on " + componentId + "."));
   }
+  console.log((" => trigger component hook \"" + hook + "\" on (" + componentId + "), args: " + (JSON.stringify(args)) + ", return: " + (JSON.stringify(result))));
   return result
 }
 
@@ -9057,6 +9058,7 @@ function updateComponentData (
     return
   }
   if (typeof document.taskCenter.updateData === 'function') {
+    console.log((" => update component data (" + componentId + "): " + (JSON.stringify(newData))));
     return document.taskCenter.updateData(componentId, newData, callback)
   }
   warn(("Failed to update component data (" + componentId + ")."));
@@ -9091,6 +9093,7 @@ function initVirtualComponent (options) {
   var vm = this;
   var componentId = options.componentId;
   def(vm, '_vmTemplate', options.vmTemplate);
+  console.log((" => create virtual component (" + componentId + ")"));
 
   // virtual component uid
   vm._uid = componentId || ("virtual-component-" + (uid$3++));
@@ -9128,6 +9131,7 @@ function initVirtualComponent (options) {
   callHook(vm, 'created');
 
   registerComponentHook(componentId, 'lifecycle', 'attach', function () {
+    console.log((" => attach virtual component (" + componentId + ")"));
     callHook(vm, 'beforeMount');
 
     new Watcher(
@@ -9145,6 +9149,7 @@ function initVirtualComponent (options) {
   });
 
   registerComponentHook(componentId, 'lifecycle', 'detach', function () {
+    console.log((" => detach virtual component (" + componentId + ")"));
     vm.$destroy();
     if (vm._vmTemplate) {
       // $flow-disable-line
@@ -9158,6 +9163,7 @@ function initVirtualComponent (options) {
 function updateVirtualComponent (vnode) {
   var vm = this;
   var componentId = vm.$options.componentId;
+  console.log((" => update virtual component (" + componentId + ")"));
   if (vm._isMounted) {
     callHook(vm, 'beforeUpdate');
   }
@@ -9166,6 +9172,7 @@ function updateVirtualComponent (vnode) {
     // TODO: data should be diffed before sending to native
     var data = getComponentState(vm);
     updateComponentData(componentId, data, function () {
+      console.log((" => after virtual component update (" + componentId + ")"));
       callHook(vm, 'updated');
     });
   }
@@ -9178,6 +9185,7 @@ function initVirtualComponentTemplate (options) {
 
   // virtual component template uid
   vm._uid = "virtual-component-template-" + (uid$3++);
+  console.log((" => init virtual component template (" + (vm._uid) + ")"));
 
   // a flag to avoid this being observed
   vm._isVue = true;
@@ -9219,6 +9227,7 @@ function resolveVirtualComponent (vnode) {
     var componentId = this._uid;
     var vmTemplate = this._vmTemplate;
     if (componentId && vmTemplate) {
+      console.log((" => emit custom event on (" + componentId + ")"));
       args.push(componentId);
       originalEmit.apply(vmTemplate, args);
     }
@@ -9249,7 +9258,9 @@ function resolveVirtualComponent (vnode) {
             }
 
             // send initial data to native
-            return getComponentState(subVm)
+            var data = getComponentState(subVm);
+            console.log((" => send initial component data (" + componentId + "): " + (JSON.stringify(data))));
+            return data
           }
         );
       },
@@ -11543,7 +11554,8 @@ function add$1 (
         context = vcs[componentId] || context;
       }
       try {
-        // console.log(' -> invoke virtual handler', args)
+        var event = args[0] || {};
+        console.log((" => invoke virtual event handler " + (event.type) + " (" + componentId + ")"));
         invokeHandler(formerHandler, args, context);
       } catch (err) {
         handleError(err, context, ("Failed to invoke virtual component handler (" + componentId + ")"));
@@ -12064,6 +12076,7 @@ function interceptArrayMethods (vm, array) {
       }
 
       // send mutations to native
+      console.log((" => list data changed, action: " + key));
       var remove$$1 = getComponentMethod(vm, 'removeData');
       var insert = getComponentMethod(vm, 'insertRange');
       var update = getComponentMethod(vm, 'setListData');
@@ -12109,6 +12122,7 @@ function watchArray (vm, array) {
         // send new item data to native
         function () {
           var update = getComponentMethod(vm, 'updateData');
+          console.log((" => update list data item " + (array.indexOf(item)) + ", " + (JSON.stringify(item))));
           update(array.indexOf(item), item);
         },
         { deep: true }
@@ -12144,6 +12158,7 @@ var RecycleList = {
       });
     }
 
+    console.log(" => render recycle-list");
     return h('weex:recycle-list', {
       on: this._events
     }, this.$slots.default)
