@@ -27,6 +27,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -91,6 +92,12 @@ class WXBridge implements IWXBridge {
   public native void takeHeapSnapshot(String filename);
 
 
+  /**
+   * update global config,
+   * @param config params
+   * */
+  public native void  updateGlobalConfig(String config);
+
   public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport){
     if (MULTIPROCESS) {
       return initFrameworkMultiProcess(framework, params, cacheDir, pieSupport);
@@ -108,7 +115,7 @@ class WXBridge implements IWXBridge {
 
   public int callNative(String instanceId, byte [] tasks, String callback) {
     try {
-     return callNative(instanceId,new String(tasks),callback);
+     return callNative(instanceId,(JSONArray)WXJsonUtils.parseWson(tasks),callback);
     } catch (Throwable e) {
       //catch everything during call native.
       // if(WXEnvironment.isApkDebugable()){
@@ -118,7 +125,7 @@ class WXBridge implements IWXBridge {
     }
   }
 
-  public int callNative(String instanceId, String tasks, String callback) {
+  public int callNative(String instanceId, JSONArray tasks, String callback) {
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if(instance != null) {
@@ -146,7 +153,7 @@ class WXBridge implements IWXBridge {
   }
   public int callAddElement(String instanceId, String ref,byte[] dom,String index, String callback) {
     try {
-      return callAddElement(instanceId,ref,new String(dom),index,callback);
+      return callAddElement(instanceId,ref, (JSONObject) WXJsonUtils.parseWson(dom),index,callback);
     } catch (Throwable e) {
       WXLogUtils.e(TAG,"callAddElement throw exception:"+e.getMessage());
       return 0;
@@ -195,7 +202,7 @@ class WXBridge implements IWXBridge {
   /**
    * JSF render Node by callAddElement
    */
-  public int callAddElement(String instanceId, String ref,String dom,String index, String callback) {
+  public int callAddElement(String instanceId, String ref,JSONObject dom,String index, String callback) {
 
     long start = System.currentTimeMillis();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -248,11 +255,10 @@ class WXBridge implements IWXBridge {
    */
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
-
-    JSONArray argArray = JSON.parseArray(arguments == null ? new String("") : new String(arguments));
+    JSONArray argArray = (JSONArray) WXJsonUtils.parseWson(arguments);
     JSONObject optionsObj = null;
     if (options != null) {
-      optionsObj = JSON.parseObject(options == null ? new String("") :new String(options));
+      optionsObj = (JSONObject) WXJsonUtils.parseWson(options);
     }
     Object object =  WXBridgeManager.getInstance().callNativeModule(instanceId,module,method,argArray,optionsObj);
     return new WXJSObject(object);
@@ -268,7 +274,7 @@ class WXBridge implements IWXBridge {
    */
   @Override
   public void callNativeComponent(String instanceId, String componentRef, String method, byte [] arguments, byte [] options) {
-    JSONArray argArray = JSON.parseArray(arguments == null ? new String("") : new String(arguments));
+     JSONArray argArray = (JSONArray)WXJsonUtils.parseWson(arguments);
      WXBridgeManager.getInstance().callNativeComponent(instanceId,componentRef,method,argArray,options);
   }
 

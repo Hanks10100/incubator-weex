@@ -35,9 +35,13 @@
     "node": ">=8"
   },
   "scripts": {
+<<<<<<< HEAD
     "postinstall": "bash ./scripts/install-hooks.sh",
     "build:jsfm": "node build/build.js jsfm",
     "build:env": "WEEX_FREEZE=true node build/build.js env",
+=======
+    "build:native": "node build/build.js native",
+>>>>>>> master
     "build:vue": "node build/build.js vue",
     "build:rax": "node build/build.js rax",
     "build:rax-api": "node build/build.js rax-api",
