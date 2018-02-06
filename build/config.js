@@ -30,9 +30,6 @@ const packageJSON = require('../package.json')
 const deps = packageJSON.dependencies
 const subversion = packageJSON.subversion
 
-// const frameworkBanner = `;(this.getJSFMVersion = function()`
-//   + `{return "${subversion.framework}"});\n`
-//   + `var global = this; var process = {env:{}}; var setTimeout = global.setTimeout;\n`
 const frameworkBanner = `var global=this; var process={env:{}}; `
   + `var setTimeout=global.setTimeout;\n`
 
