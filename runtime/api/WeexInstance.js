@@ -132,14 +132,26 @@ export default class WeexInstance {
   importScript (src, options = {}) {
     const id = getId(this)
     const taskCenter = getTaskCenter(id)
-    if (taskCenter && typeof taskCenter.send === 'function') {
-      return taskCenter.send('module', {
-        module: 'script',
-        method: 'importScript'
-      }, [src, options])
-    }
-    console.error(`[JS Framework] Failed to import script "${src}", `
-      + `no taskCenter (${id}) matched.`)
+    return new Promise((resolve, reject) => {
+      if (!taskCenter || typeof !taskCenter.send === 'function') {
+        reject(new Error(`[JS Framework] Failed to import script "${src}", `
+          + `no taskCenter (${id}) matched.`))
+      }
+      try {
+        taskCenter.send('module', {
+          module: 'script',
+          method: 'importScript'
+        }, [src, options], {
+          callback: [
+            result => resolve(result),
+            error => reject(error)
+          ]
+        })
+      }
+      catch (e) {
+        reject(e)
+      }
+    })
   }
 
   // registerStyleSheet (styles) {
