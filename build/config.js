@@ -58,7 +58,9 @@ const configs = {
     input: absolute('runtime/entries/polyfill.js'),
     output: {
       format: 'iife',
-      file: absolute('pre-build/weex-polyfill')
+      file: absolute('pre-build/weex-polyfill'),
+      banner: `/* Environment Polyfill, Build ${now()}. */\n\n`
+        + `var global = this; var process = {env:{}};`
     }
   },
   'weex-vue': {
