@@ -126,7 +126,6 @@ function createInstanceContext (id, options = {}, data) {
   if (typeof framework.createInstanceContext === 'function') {
     Object.assign(instanceContext, framework.createInstanceContext(id, runtimeContext, data))
   }
-  Object.freeze(weex)
   Object.freeze(instanceContext)
   return instanceContext
 }
