@@ -92,7 +92,6 @@ function getFrameworkType (id) {
 
 function createInstanceContext (id, options = {}, data) {
   const weex = new WeexInstance(id, options)
-  Object.freeze(weex)
 
   const bundleType = options.bundleType || 'Vue'
   instanceTypeMap[id] = bundleType
