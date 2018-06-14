@@ -22,7 +22,6 @@ import { receiveTasks } from '../bridge/receiver'
 import { registerModules } from './module'
 import { registerComponents } from './component'
 import { services, register, unregister } from './service'
-import { track } from '../bridge/debug'
 import WeexInstance from './WeexInstance'
 import { getDoc } from '../vdom/operation'
 
@@ -99,7 +98,6 @@ function createInstanceContext (id, options = {}, data) {
   if (!framework) {
     return new Error(`[JS Framework] Invalid bundle type "${bundleType}".`)
   }
-  track(id, 'bundleType', bundleType)
 
   // prepare js service
   const services = createServices(id, {
