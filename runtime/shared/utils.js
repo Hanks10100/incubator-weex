@@ -99,11 +99,22 @@ export function resetLevelMap () {
 }
 
 /**
+ *  Support pass flag via native method to override log level.
+ */
+let printInteractionLog = null // non-boolean value means still use log level
+global.switchInteractionLog = function switchInteractionLog (toggle) {
+  printInteractionLog = !!toggle
+}
+
+/**
  * Check if a certain type of message will be sent in current log level of env.
  * @param  {string} type
  * @return {boolean}
  */
 export function checkLevel (type) {
+  if (printInteractionLog !== null) {
+    return printInteractionLog
+  }
   const logLevel = (global.WXEnvironment && global.WXEnvironment.logLevel) || 'log'
   return levelMap[logLevel] && levelMap[logLevel][type]
 }
