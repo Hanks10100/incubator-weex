@@ -52,12 +52,21 @@ function moduleSetter (id, module, method, fn) {
   return fn => taskCenter.send('module', { module, method }, [fn])
 }
 
+function createDocument (id, config) {
+  if (typeof WeexDocument === 'function') {
+    console.warn(`[JS Framework] create new native document instance of WeexDocument (id: ${id}).`)
+    return new WeexDocument(id, config.bundleUrl)
+  }
+  console.warn(`[JS Framework] using js framework mocked document (id: ${id}).`)
+  return new Document(id, config.bundleUrl)
+}
+
 export default class WeexInstance {
   constructor (id, config, data) {
     setId(this, String(id))
     this.config = config || {}
     this._nativeData = data || {}
-    this.document = new Document(id, this.config.bundleUrl)
+    this.document = createDocument()
     this.requireModule = this.requireModule.bind(this)
     this.importScript = this.importScript.bind(this)
     this.isRegisteredModule = isRegisteredModule
