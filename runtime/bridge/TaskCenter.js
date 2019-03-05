@@ -113,12 +113,12 @@ export class TaskCenter {
         return this[action](this.instanceId, args)
       }
       case 'component':
-        return this.componentHandler(this.instanceId, ref, method, args, Object.assign({ component }, options))
+        return this.callComponent(ref, method, args, Object.assign({ component }, options))
       default: {
         if (checkLevel('debug')) {
           debugLog(`[task](${this.instanceId},${module},${method}) ${JSON.stringify(args)}`)
         }
-        return this.moduleHandler(this.instanceId, module, method, args, options)
+        return this.callModule(module, method, args, options)
       }
     }
   }
@@ -128,11 +128,17 @@ export class TaskCenter {
   }
 
   callComponent (ref, method, args, options) {
-    return this.componentHandler(this.instanceId, ref, method, args, options)
+    if (typeof global.callNativeComponent === 'function') {
+      return global.callNativeComponent(this.instanceId, ref, method, args, options)
+    }
+    return fallback(this.instanceId, [{ component: options.component, ref, method, args }])
   }
 
   callModule (module, method, args, options) {
-    return this.moduleHandler(this.instanceId, module, method, args, options)
+    if (typeof global.callNativeModule === 'function') {
+      return global.callNativeModule(this.instanceId, module, method, args, options)
+    }
+    return fallback(this.instanceId, [{ module, method, args }])
   }
 }
 
@@ -162,12 +168,4 @@ export function init () {
       (id, args) => method(id, ...args) :
       (id, args) => fallback(id, [{ module: 'dom', method: name, args }], '-1')
   }
-
-  proto.componentHandler = global.callNativeComponent ||
-    ((id, ref, method, args, options) =>
-      fallback(id, [{ component: options.component, ref, method, args }]))
-
-  proto.moduleHandler = global.callNativeModule ||
-    ((id, module, method, args) =>
-      fallback(id, [{ module, method, args }]))
 }
